@@ -26,6 +26,9 @@
 
 Adafruit_SSD1306 display(128, 64, &Wire, OLED_RST);
 
+unsigned long lastPacketTime = 0;
+unsigned long packetInterval = 5000;  // Packet send interval in milliseconds
+
 void setup() {
   Serial.begin(115200);
   while (!Serial);
@@ -54,20 +57,24 @@ void setup() {
 }
 
 void loop() {
-  // Send a message
-  String message = "Hello LoRa World!";
-  LoRa.beginPacket();
-  LoRa.print(message);
-  LoRa.endPacket();
+  // Send a packet every packetInterval milliseconds
+  if (millis() - lastPacketTime >= packetInterval) {
+    String message = "Hello LoRa World!";
+    LoRa.beginPacket();
+    LoRa.print(message);
+    LoRa.endPacket();
 
-  Serial.println("Message sent: " + message);
-  display.clearDisplay();
-  display.setTextSize(1);
-  display.setTextColor(WHITE);
-  display.setCursor(0, 0);
-  display.println("Message sent:");
-  display.println(message);
-  display.display();
+    Serial.println("Message sent: " + message);
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
+    display.setCursor(0, 0);
+    display.println("Message sent:");
+    display.println(message);
+    display.display();
+
+    lastPacketTime = millis();  // Update the last packet time
+  }
 
   // Receive a message
   int packetSize = LoRa.parsePacket();
@@ -84,8 +91,5 @@ void loop() {
     display.println("Message received:");
     display.println(receivedMessage);
     display.display();
-
   }
-
-  delay(5000);  // Wait 5 seconds
 }
