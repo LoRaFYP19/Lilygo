@@ -27,7 +27,7 @@
 Adafruit_SSD1306 display(128, 64, &Wire, OLED_RST);
 
 unsigned long lastPacketTime = 0;
-unsigned long packetInterval = 5000;  // Packet send interval in milliseconds
+unsigned long packetInterval = 10000;  // Packet send interval in milliseconds
 
 void setup() {
   Serial.begin(115200);
