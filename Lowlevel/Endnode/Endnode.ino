@@ -3,22 +3,20 @@
    with rx interupt trigger for Lilygo LoRa 2.1_1.6V module.
 */
 
+
 #include <RadioLib.h>
 #include "utilities.h"
 #include "boards.h"
 
 SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 
+#define LoRa_frequency 923.0
 // flag to indicate that a packet was received
 volatile bool receivedFlag = false;
 
 // disable interrupt when it's not needed
 volatile bool enableInterrupt = true;
 
-// this function is called when a complete packet
-// is received by the module
-// IMPORTANT: this function MUST be 'void' type
-//            and MUST NOT have any arguments!
 void setFlag(void)
 {
     // check if the interrupt is enabled
@@ -39,12 +37,13 @@ void setup()
     // initialize SX1276 with default settings
     Serial.print(F("[SX1276] Initializing ... "));
 #ifndef LoRa_frequency
-    int state = radio.begin(868.0);
+    int state = radio.begin(923.0);
 #else
     int state = radio.begin(LoRa_frequency);
 #endif
     if (state == RADIOLIB_ERR_NONE) {
         Serial.println(F("success!"));
+        radio.setSpreadingFactor(7);
         radio.setOutputPower(17);
         radio.setBandwidth(125);
         radio.setCurrentLimit(120);
