@@ -1,23 +1,6 @@
 /*
-   RadioLib SX127x Receive Example
-
-   This example listens for LoRa transmissions using SX127x Lora modules.
-   To successfully receive data, the following settings have to be the same
-   on both transmitter and receiver:
-    - carrier frequency
-    - bandwidth
-    - spreading factor
-    - coding rate
-    - sync word
-    - preamble length
-
-   Other modules from SX127x/RFM9x family can also be used.
-
-   For default module settings, see the wiki page
-   https://github.com/jgromes/RadioLib/wiki/Default-configuration#sx127xrfm9x---lora-modem
-
-   For full API reference, see the GitHub Pages
-   https://jgromes.github.io/RadioLib/
+   RadioLib SX1276 Receive Example
+   with rx interupt trigger for Lilygo LoRa 2.1_1.6V module.
 */
 
 #include <RadioLib.h>
