@@ -1,6 +1,6 @@
 /*
    RadioLib SX1276 Receive Example
-   with rx interupt trigger for Lilygo LoRa 2.1_1.6V module.
+   with rx interupt/ TX interupt trigger for Lilygo LoRa 2.1_1.6V module.
 */
 
 
@@ -11,21 +11,28 @@
 SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 
 #define LoRa_frequency 923.0
-// flag to indicate that a packet was received
-volatile bool receivedFlag = false;
+#define LoRa_TX_PIN 34 // for TX trigger
 
-// disable interrupt when it's not needed
-volatile bool enableInterrupt = true;
+volatile bool actionFlag = false; // Flag to indicate that a packet was received or sent
+volatile bool isTransmitting = false; // Flag to identify TX or RX
+volatile bool enableInterrupt = true; // Flag to enable interrupt
 
-void setFlag(void)
-{
-    // check if the interrupt is enabled
+// save transmission state between loops
+int transmissionState = RADIOLIB_ERR_NONE;
+
+// Interrupt handler for both transmit and receive
+void handleInterrupt() {
     if (!enableInterrupt) {
         return;
     }
 
-    // we got a packet, set the flag
-    receivedFlag = true;
+    actionFlag = true;
+}
+
+void startTransmission() {
+    Serial.print(F("[SX1276] Sending first packet ... "));
+    isTransmitting = true;
+    transmissionState = radio.startTransmit("Hello World!");
 }
 
 void setup()
@@ -53,12 +60,12 @@ void setup()
         while (true);
     }
     // set the function that will be called
-    // when new packet is received
-    radio.setDio0Action(setFlag, RISING);
+    // when new packet is received or trasnmitted
+    radio.setDio0Action(handleInterrupt, RISING); // Trigger on Either Transmisson end or reception start
 
-    // start listening for LoRa packets
+    // start listening for LoRa packets at the initial setup
     Serial.print(F("[SX1276] Starting to listen ... "));
-    state = radio.startReceive();
+    state = radio.startReceive(); 
 #ifdef HAS_DISPLAY
     if (u8g2) {
         if (state != RADIOLIB_ERR_NONE) {
@@ -76,91 +83,119 @@ void setup()
         while (true);
     }
 
+    //setup a pin to trigger transmission
+    pinMode(LoRa_TX_PIN, INPUT_PULLUP);
 
     // if needed, 'listen' mode can be disabled by calling
     // any of the following methods:
-    //
     // radio.standby()
     // radio.sleep()
     // radio.transmit();
     // radio.receive();
     // radio.readData();
-    // radio.scanChannel();
+    // radio.scanChannel(); // will help with channel sensing
 }
 
+void loop(){
 
-void loop()
-{
-    // check if the flag is set
-    if (receivedFlag) {
-        // disable the interrupt service routine while
-        // processing the data
+    if (digitalRead(LoRa_TX_PIN) == HIGH) {
+        startTransmission();
+    }
+
+    // check if the flag is triggerd
+    if (actionFlag){
+        actionFlag = false;
         enableInterrupt = false;
 
-        // reset flag
-        receivedFlag = false;
+        if (isTransmitting) {
+            if (transmissionState == RADIOLIB_ERR_NONE){
+                Serial.println(F("Transmisson was success!"));
+            }
+            else {
+                Serial.print(F("failed, code "));
+                Serial.println(transmissionState);
+            }
+            // clean up after transmission is finished
+            // this will ensure transmitter is disabled,
+            // RF switch is powered down etc.
+            radio.finishTransmit();
+            // wait a second for NOW
+            delay(1000);
 
-        // you can read received data as an Arduino String
+            #ifdef HAS_DISPLAY
+            if (u8g2) {
+                char buf[256];
+                u8g2->clearBuffer();
+                u8g2->drawStr(0, 12, "Transmitting: OK!");
+                snprintf(buf, sizeof(buf), "Rate:%.2f bps", radio.getDataRate());
+                u8g2->drawStr(5, 30, buf);
+                u8g2->sendBuffer();
+            }
+            #endif
+             // Set the flag to false after transmission is completed
+            isTransmitting = false;
+
+            // put module back to listen mode
+            radio.startReceive();
+
+    }
+    else{
+        // Triggered by reception
+        // read received data as an Arduino String
         String str;
-        int state = radio.readData(str);
+        int receptionstate = radio.readData(str);
 
-        // you can also read received data as byte array
-        /*
-          byte byteArr[8];
-          int state = radio.readData(byteArr, 8);
-        */
-
-        if (state == RADIOLIB_ERR_NONE) {
-            // packet was successfully received
+        if (receptionstate == RADIOLIB_ERR_NONE){
             Serial.println(F("[SX1276] Received packet!"));
-
-            // print data of the packet
-            Serial.print(F("[SX1276] Data:\t\t"));
             Serial.println(str);
 
-            // print RSSI (Received Signal Strength Indicator)
+            // print RSSI, SNR and frequency offset
             Serial.print(F("[SX1276] RSSI:\t\t"));
             Serial.print(radio.getRSSI());
             Serial.println(F(" dBm"));
 
-            // print SNR (Signal-to-Noise Ratio)
             Serial.print(F("[SX1276] SNR:\t\t"));
             Serial.print(radio.getSNR());
             Serial.println(F(" dB"));
 
-            // print frequency error
             Serial.print(F("[SX1276] Frequency error:\t"));
             Serial.print(radio.getFrequencyError());
             Serial.println(F(" Hz"));
-#ifdef HAS_DISPLAY
-            if (u8g2) {
-                u8g2->clearBuffer();
-                char buf[256];
-                u8g2->drawStr(0, 12, "Received OK!");
-                u8g2->drawStr(5, 26, str.c_str());
-                snprintf(buf, sizeof(buf), "RSSI:%.2f", radio.getRSSI());
-                u8g2->drawStr(0, 40, buf);
-                snprintf(buf, sizeof(buf), "SNR:%.2f", radio.getSNR());
-                u8g2->drawStr(0, 54, buf);
-                u8g2->sendBuffer();
-            }
-#endif
-        } else if (state == RADIOLIB_ERR_CRC_MISMATCH) {
+            #ifdef HAS_DISPLAY
+                if (u8g2) {
+                    char buf[256];
+                    u8g2->clearBuffer();
+                    u8g2->drawStr(0, 12, "Received OK!");
+                    u8g2->drawStr(5, 26, str.c_str());
+                    snprintf(buf, sizeof(buf), "RSSI:%.2f", radio.getRSSI());
+                    u8g2->drawStr(0, 40, buf);
+                    snprintf(buf, sizeof(buf), "SNR:%.2f", radio.getSNR());
+                    u8g2->drawStr(0, 54, buf);
+                    u8g2->sendBuffer();
+                }
+            #endif
+        
+        
+        
+        }
+        else if (receptionstate == RADIOLIB_ERR_CRC_MISMATCH){
             // packet was received, but is malformed
             Serial.println(F("[SX1276] CRC error!"));
-
-        } else {
-            // some other error occurred
-            Serial.print(F("[SX1276] Failed, code "));
-            Serial.println(state);
         }
-
+        else{
+            Serial.print(F("[SX1276] Failed, code "));
+            Serial.println(receptionstate);
+        }
         // put module back to listen mode
         radio.startReceive();
-
-        // we're ready to receive more packets,
         // enable interrupt service routine
-        enableInterrupt = true;
+
     }
+
+
+
+}
+ enableInterrupt = true;
+
 }
 
