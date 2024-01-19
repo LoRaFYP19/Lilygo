@@ -1,11 +1,19 @@
 #include <RadioLib.h>
 #include "boards.h"
+#include <ezTime.h>
+#include <WiFi.h>
+
 
 SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 
 #define LoRa_frequency 923.0
+
 // save transmission state between loops
 int transmissionState = RADIOLIB_ERR_NONE;
+int maxNumOfPackets = 100;
+const char* ssid = "V1";
+const char* password = "123456789";
+int txNumber=0;
 
 // flag to indicate that a packet was sent
 volatile bool transmittedFlag = false;
@@ -25,9 +33,30 @@ void setFlag(void)
 
 void setup()
 {
+    Serial.begin(115200);
     initBoard();
     // When the power is turned on, a delay is required.
     delay(1500);
+
+    WiFi.begin(ssid, password);
+    Serial.println("Connecting");
+    while(WiFi.status() != WL_CONNECTED) {
+      delay(500);
+      Serial.print(".");
+    }
+    delay(5000);
+    Serial.println("");
+    Serial.print("Connected to WiFi network with IP Address: ");
+    Serial.println(WiFi.localIP());
+    
+    setInterval(60);
+    
+    waitForSync();
+    String val_1 = UTC.dateTime("l, d-M-y H:i:s.v T");
+
+    Serial.println(val_1);
+    
+    txNumber=0;
 
     // initialize SX1276 with default settings
     Serial.print(F("Initializing ... "));
@@ -76,14 +105,45 @@ void setup()
     */
 }
 
+void int64ToHexString(int64_t value, char* buffer, size_t size) {
+    snprintf(buffer, size, "%llx", static_cast<unsigned long long>(value));
+}
+
+
 void sendPacket()
 {
     // send packet
-    transmissionState = radio.startTransmit("Hello World!");
+    txNumber++;
+     char txpacket[20];
+    if (txNumber <= maxNumOfPackets)
+    {
+        // int64_t tMili = (UTC.dateTime("sv")).toInt();
+        // int tmiliMin = (UTC.dateTime("i")).toInt();
+        // int64_t tmiliH = (UTC.dateTime("H")).toInt();
+        // tMili = tmiliMin * 60000 + tMili + tmiliH * 3600000;
+
+        int64_t tMili = (UTC.dateTime("sv")).toInt() + (UTC.dateTime("i")).toInt() * 60000 + (UTC.dateTime("H")).toInt() * 3600000;
+
+       
+        int64ToHexString(tMili, txpacket, sizeof(txpacket));
+
+    }
+
+        else if(txNumber <= 550){
+      
+        sprintf(txpacket,"Tx Done");  //start a package
+   
+
+    }
+    else{
+      txNumber = 0; //reset the counter  
+      }
+    transmissionState = radio.startTransmit(tMiliHexStr);
 }
 
 void loop()
 {
+    events();
     // check if the previous transmission finished
     if (transmittedFlag) {
         // disable the interrupt service routine while
@@ -117,17 +177,11 @@ void loop()
 
         // send another one
         Serial.print(F("Sending another packet ... "));
+        sendPacket();
 
         // you can transmit C-string or Arduino string up to
-        // 256 characters long
-        transmissionState = radio.startTransmit("Hello World!");
+        
 
-        // you can also transmit byte array up to 256 bytes long
-        /*
-          byte byteArr[] = {0x01, 0x23, 0x45, 0x67,
-                            0x89, 0xAB, 0xCD, 0xEF};
-          int state = radio.startTransmit(byteArr, 8);
-        */
 #ifdef HAS_DISPLAY
         if (u8g2) {
             char buf[256];
