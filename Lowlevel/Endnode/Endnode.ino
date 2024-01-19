@@ -1,6 +1,6 @@
 /*
-   RadioLib SX1276 Receive Example
-   with rx interupt/ TX interupt trigger for Lilygo LoRa 2.1_1.6V module.
+   RadioLib SX1276 Receive/Transmission Example
+   with RX interupt/ TX interupt trigger for Lilygo LoRa 2.1_1.6V module.
 */
 
 
@@ -12,10 +12,14 @@ SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUS
 
 #define LoRa_frequency 923.0
 #define LoRa_TX_PIN 34 // for TX trigger
+#define Dummy_TX_Inteval 10000 // in ms
+
 
 volatile bool actionFlag = false; // Flag to indicate that a packet was received or sent
 volatile bool isTransmitting = false; // Flag to identify TX or RX
 volatile bool enableInterrupt = true; // Flag to enable interrupt
+
+unsigned long previousTransmissionTime = 0; // Variable to store the previous transmission time
 
 // save transmission state between loops
 int transmissionState = RADIOLIB_ERR_NONE;
@@ -30,9 +34,9 @@ void handleInterrupt() {
 }
 
 void startTransmission() {
-    Serial.print(F("[SX1276] Sending first packet ... "));
+    Serial.print(F("Sending first packet ... "));
     isTransmitting = true;
-    transmissionState = radio.startTransmit("Hello World!");
+    transmissionState = radio.startTransmit("Hello World!"); // this is non-blocking action, meaning the radio is transmitting, the execution of other tasks are not on hold
 }
 
 void setup()
@@ -42,7 +46,7 @@ void setup()
     delay(1500);
 
     // initialize SX1276 with default settings
-    Serial.print(F("[SX1276] Initializing ... "));
+    Serial.print(F("Initializing ... "));
 #ifndef LoRa_frequency
     int state = radio.begin(923.0);
 #else
@@ -64,7 +68,7 @@ void setup()
     radio.setDio0Action(handleInterrupt, RISING); // Trigger on Either Transmisson end or reception start
 
     // start listening for LoRa packets at the initial setup
-    Serial.print(F("[SX1276] Starting to listen ... "));
+    Serial.print(F("Starting to listen ... "));
     state = radio.startReceive(); 
 #ifdef HAS_DISPLAY
     if (u8g2) {
@@ -84,7 +88,7 @@ void setup()
     }
 
     //setup a pin to trigger transmission
-    pinMode(LoRa_TX_PIN, INPUT_PULLUP);
+    // pinMode(LoRa_TX_PIN, INPUT_PULLUP);
 
     // if needed, 'listen' mode can be disabled by calling
     // any of the following methods:
@@ -98,7 +102,14 @@ void setup()
 
 void loop(){
 
-    if (digitalRead(LoRa_TX_PIN) == HIGH) {
+    // if (digitalRead(LoRa_TX_PIN) == HIGH) {
+    //     startTransmission();
+    // }
+
+    if(millis() - previousTransmissionTime >= Dummy_TX_Inteval){ // for now, just send a dummy packet every 10 seconds with random delay
+        previousTransmissionTime = millis();
+        // wait random amount of time between 1 and 5 seconds
+        delay(random(1000, 5000));
         startTransmission();
     }
 
@@ -119,8 +130,6 @@ void loop(){
             // this will ensure transmitter is disabled,
             // RF switch is powered down etc.
             radio.finishTransmit();
-            // wait a second for NOW
-            delay(1000);
 
             #ifdef HAS_DISPLAY
             if (u8g2) {
@@ -146,19 +155,19 @@ void loop(){
         int receptionstate = radio.readData(str);
 
         if (receptionstate == RADIOLIB_ERR_NONE){
-            Serial.println(F("[SX1276] Received packet!"));
+            Serial.println(F("Received packet!"));
             Serial.println(str);
 
             // print RSSI, SNR and frequency offset
-            Serial.print(F("[SX1276] RSSI:\t\t"));
+            Serial.print(F("RSSI:\t\t"));
             Serial.print(radio.getRSSI());
             Serial.println(F(" dBm"));
 
-            Serial.print(F("[SX1276] SNR:\t\t"));
+            Serial.print(F("SNR:\t\t"));
             Serial.print(radio.getSNR());
             Serial.println(F(" dB"));
 
-            Serial.print(F("[SX1276] Frequency error:\t"));
+            Serial.print(F("Frequency error:\t"));
             Serial.print(radio.getFrequencyError());
             Serial.println(F(" Hz"));
             #ifdef HAS_DISPLAY
@@ -175,15 +184,13 @@ void loop(){
                 }
             #endif
         
-        
-        
         }
         else if (receptionstate == RADIOLIB_ERR_CRC_MISMATCH){
             // packet was received, but is malformed
-            Serial.println(F("[SX1276] CRC error!"));
+            Serial.println(F("CRC error!"));
         }
         else{
-            Serial.print(F("[SX1276] Failed, code "));
+            Serial.print(F("Failed, code "));
             Serial.println(receptionstate);
         }
         // put module back to listen mode
