@@ -11,9 +11,11 @@ SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUS
 // save transmission state between loops
 int transmissionState = RADIOLIB_ERR_NONE;
 int maxNumOfPackets = 100;
-const char* ssid = "V1";
+const char* ssid = "F1";
 const char* password = "123456789";
 int txNumber=0;
+
+#define IntervalForSend 2000
 
 // flag to indicate that a packet was sent
 volatile bool transmittedFlag = false;
@@ -81,6 +83,7 @@ void setup()
         radio.setOutputPower(17);
         radio.setBandwidth(125);
         radio.setCurrentLimit(120);
+        radio.setSpreadingFactor(7);
     } else {
         Serial.print(F("failed, code "));
         Serial.println(state);
@@ -91,11 +94,11 @@ void setup()
     radio.setDio0Action(setFlag, RISING);
 
     // start transmitting the first packet
-    Serial.print(F("Sending first packet ... "));
+    // Serial.print(F("Sending first packet ... "));
 
     // you can transmit C-string or Arduino string up to
     // 256 characters long
-    transmissionState = radio.startTransmit("Hello World!");
+    // transmissionState = radio.startTransmit("Hello World!");
 
     // you can also transmit byte array up to 256 bytes long
     /*
@@ -114,31 +117,31 @@ void sendPacket()
 {
     // send packet
     txNumber++;
-     char txpacket[20];
+    Serial.println("Trying to send the packet number: ");
+    Serial.println(txNumber);
+    char txpacket[20];
     if (txNumber <= maxNumOfPackets)
     {
-        // int64_t tMili = (UTC.dateTime("sv")).toInt();
-        // int tmiliMin = (UTC.dateTime("i")).toInt();
-        // int64_t tmiliH = (UTC.dateTime("H")).toInt();
-        // tMili = tmiliMin * 60000 + tMili + tmiliH * 3600000;
-
         int64_t tMili = (UTC.dateTime("sv")).toInt() + (UTC.dateTime("i")).toInt() * 60000 + (UTC.dateTime("H")).toInt() * 3600000;
-
        
         int64ToHexString(tMili, txpacket, sizeof(txpacket));
+        transmissionState = radio.startTransmit(txpacket);
 
     }
 
-        else if(txNumber <= 550){
+        else if(txNumber <= maxNumOfPackets + 20){
       
         sprintf(txpacket,"Tx Done");  //start a package
+        transmissionState = radio.startTransmit(txpacket);
    
 
     }
     else{
-      txNumber = 0; //reset the counter  
+      txNumber = 0; //reset the counter
+
       }
-    transmissionState = radio.startTransmit(tMiliHexStr);
+
+    
 }
 
 void loop()
@@ -155,7 +158,8 @@ void loop()
 
         if (transmissionState == RADIOLIB_ERR_NONE) {
             // packet was successfully sent
-            Serial.println(F("transmission finished!"));
+            Serial.println(txNumber);
+            Serial.println(F("packet got transmission finished!"));
 
             // NOTE: when using interrupt-driven transmit method,
             //       it is not possible to automatically measure
@@ -171,13 +175,6 @@ void loop()
         // this will ensure transmitter is disabled,
         // RF switch is powered down etc.
         radio.finishTransmit();
-
-        // wait a second before transmitting again
-        delay(1000);
-
-        // send another one
-        Serial.print(F("Sending another packet ... "));
-        sendPacket();
 
         // you can transmit C-string or Arduino string up to
         
@@ -195,5 +192,10 @@ void loop()
         // we're ready to send more packets,
         // enable interrupt service routine
         enableInterrupt = true;
+    }
+    
+    // send packet every 2 seconds using milis()
+    if (millis() % IntervalForSend == 0) {
+        sendPacket();
     }
 }
