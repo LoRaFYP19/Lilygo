@@ -340,7 +340,7 @@ void initBoard()
         u8g2->clearBuffer();
         do {
             u8g2->setCursor(0, 16);
-            u8g2->println( "Waiting to receive data");;
+            u8g2->println( "Ready to Send your Data");;
         } while ( u8g2->nextPage() );
     }
 #endif

@@ -10,7 +10,7 @@ SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUS
 
 // save transmission state between loops
 int transmissionState = RADIOLIB_ERR_NONE;
-int maxNumOfPackets = 100;
+int maxNumOfPackets =100;
 const char* ssid = "F1";
 const char* password = "123456789";
 int txNumber=0;
@@ -129,10 +129,13 @@ void sendPacket()
 
     }
 
-        else if(txNumber <= maxNumOfPackets + 20){
+        else if(txNumber <= maxNumOfPackets + 10){
       
         sprintf(txpacket,"Tx Done");  //start a package
+        Serial.println("Done Payloads sending Tx Done");
+        Serial.println(txpacket);
         transmissionState = radio.startTransmit(txpacket);
+        delay(3000); // additionnal delay to be sure that the receiver got the message without spaming the channel
    
 
     }
