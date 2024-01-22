@@ -250,7 +250,7 @@ void handleInterrupt() {
 void startTransmission() {
     Serial.print(F("Sending back ... "));
     isTransmitting = true;
-    radio.setSpreadingFactor(Spreadf);
+    radio.setSpreadingFactor(repeatSF);
     //transmissionState = radio.startTransmit("Hello World!"); // this is non-blocking action, meaning the radio is transmitting, the execution of other tasks are not on hold
     transmissionState = radio.startTransmit(str); // this is non-blocking action, meaning the radio is transmitting, the execution of other tasks are not on hold
 
