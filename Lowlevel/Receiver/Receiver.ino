@@ -242,7 +242,7 @@ void loop()
                 Serial.println(rxNumber);
                 for (int i = 0; i < str.length(); i++) {
                     char hex_digit = str[i];
-                    int digit_value = (hex_digit >= '0' && hex_digit <= '9') ? hex_digit - '0' : hex_digit - 'A' + 10;
+                    int digit_value = (hex_digit >= '0' && hex_digit <= '9') ? hex_digit - '0' : hex_digit - 'a' + 10;
                     rxMili = (rxMili << 4) | digit_value;
                 }
                 Serial.println(rxMili);
