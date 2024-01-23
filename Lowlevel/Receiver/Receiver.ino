@@ -140,7 +140,7 @@ void setup()
 
 void sendDataToSheet(){
   Serial.println("Sending the Data");
-  if(WIFI.status() != WL_CONNECTED){
+  if(WiFi.status() != WL_CONNECTED){
     WiFi.disconnect();
     delay(1000);
     WiFi.begin(ssid, password);
@@ -225,7 +225,7 @@ void loop()
             Serial.println(str);
             
             if(strcmp(str.c_str(),"Tx Done")==0){
-                radio.clearDio0Action()
+                radio.clearDio0Action();
                 Serial.println("Test is Done");
                 Serial.println("SF "+String(SpreadF)+" Output Power: "+String(OPower) +" Total Rx Number: " + String(rxNumber) + " Average RSSI: " + String(tolRSSI/rxNumber) + " Max RSSI: " + String(maxRSSI) + " Min RSSI: " + String(minRSSI) + " Total Time on Air: " + String(totalTimeOnAir)+ " Average Time On Air: "+ String(totalTimeOnAir/rxNumber) + " Min Time on Air: " + String(minTimeOnAir) + " Max Time on Air: " + String(maxTimeOnAir)+" Average SNR: "+String(totalSnr/rxNumber)+" Average Frequency Error: "+String(tolFrqError/rxNumber));
                 if (txSheet == false){
