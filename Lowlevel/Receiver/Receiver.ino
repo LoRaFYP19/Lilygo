@@ -279,20 +279,6 @@ void loop()
 
             }
 
-            // // print RSSI (Received Signal Strength Indicator)
-            // Serial.print(F("RSSI:\t\t"));
-            // Serial.print(radio.getRSSI());
-            // Serial.println(F(" dBm"));
-
-            // // print SNR (Signal-to-Noise Ratio)
-            // Serial.print(F("SNR:\t\t"));
-            // Serial.print(radio.getSNR());
-            // Serial.println(F(" dB"));
-
-            // // print frequency error
-            // Serial.print(F("Frequency error:\t"));
-            // Serial.print(radio.getFrequencyError());
-            // Serial.println(F(" Hz"));
 #ifdef HAS_DISPLAY
             if (u8g2) {
                 u8g2->clearBuffer();

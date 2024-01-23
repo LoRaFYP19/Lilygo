@@ -93,19 +93,6 @@ void setup()
     // when packet transmission is finished
     radio.setDio0Action(setFlag, RISING);
 
-    // start transmitting the first packet
-    // Serial.print(F("Sending first packet ... "));
-
-    // you can transmit C-string or Arduino string up to
-    // 256 characters long
-    // transmissionState = radio.startTransmit("Hello World!");
-
-    // you can also transmit byte array up to 256 bytes long
-    /*
-      byte byteArr[] = {0x01, 0x23, 0x45, 0x67,
-                        0x89, 0xAB, 0xCD, 0xEF};
-      state = radio.startTransmit(byteArr, 8);
-    */
 }
 
 void int64ToHexString(int64_t value, char* buffer, size_t size) {
