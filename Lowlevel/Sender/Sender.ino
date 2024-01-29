@@ -7,7 +7,7 @@
 SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 
 #define LoRa_frequency 923.0
-
+#define nodeID 1
 // save transmission state between loops
 int transmissionState = RADIOLIB_ERR_NONE;
 int maxNumOfPackets =100;
@@ -15,7 +15,9 @@ const char* ssid = "F1";
 const char* password = "123456789";
 int txNumber=0;
 
-#define IntervalForSend 2000
+
+
+#define IntervalForSend 4000
 
 // flag to indicate that a packet was sent
 volatile bool transmittedFlag = false;
@@ -83,7 +85,7 @@ void setup()
         radio.setOutputPower(17);
         radio.setBandwidth(125);
         radio.setCurrentLimit(120);
-        radio.setSpreadingFactor(7);
+        radio.setSpreadingFactor(12);
     } else {
         Serial.print(F("failed, code "));
         Serial.println(state);
@@ -96,7 +98,8 @@ void setup()
 }
 
 void int64ToHexString(int64_t value, char* buffer, size_t size) {
-    snprintf(buffer, size, "%llx", static_cast<unsigned long long>(value));
+    // snprintf(buffer, size, "%llx", static_cast<unsigned long long>(value)); //  for defualt payload
+    snprintf(buffer, size, "%d,%llx", nodeID, static_cast<unsigned long long>(value)); // payload with node ID
 }
 
 
@@ -110,9 +113,31 @@ void sendPacket()
     if (txNumber <= maxNumOfPackets)
     {
         int64_t tMili = (UTC.dateTime("sv")).toInt() + (UTC.dateTime("i")).toInt() * 60000 + (UTC.dateTime("H")).toInt() * 3600000;
+        Serial.println("The tMili is: ");
+        Serial.println(tMili);
+        
+
+
        
         int64ToHexString(tMili, txpacket, sizeof(txpacket));
+        // add the node ID to the packet front with a comma separated
+     
+
+
         transmissionState = radio.startTransmit(txpacket);
+        Serial.println("The txpacket is: ");
+        Serial.println(txpacket);
+
+        String str = txpacket;
+        int64_t rxMili = 0;
+                for (int i = 0; i < str.length(); i++) {
+                    char hex_digit = str[i];
+                    int digit_value = (hex_digit >= '0' && hex_digit <= '9') ? hex_digit - '0' : hex_digit - 'a' + 10;
+                    rxMili = (rxMili << 4) | digit_value;
+                }
+
+        Serial.println("The decoded integer is ");
+        Serial.println(rxMili);
 
     }
 
