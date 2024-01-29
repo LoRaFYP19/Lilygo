@@ -16,6 +16,7 @@ SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUS
 #define Spreadf 7
 #define repeatSF 8
 
+int numberofpackets=0;
 String str;
 
 volatile bool actionFlag = false; // Flag to indicate that a packet was received or sent
@@ -144,20 +145,22 @@ void loop(){
 
         if (receptionstate == RADIOLIB_ERR_NONE){
             Serial.println(F("Received packet!"));
+            numberofpackets++;
             Serial.println(str);
+            Serial.println(numberofpackets);
             
-            // print RSSI, SNR and frequency offset
-            Serial.print(F("RSSI:\t\t"));
-            Serial.print(radio.getRSSI());
-            Serial.println(F(" dBm"));
+            // // print RSSI, SNR and frequency offset
+            // Serial.print(F("RSSI:\t\t"));
+            // Serial.print(radio.getRSSI());
+            // Serial.println(F(" dBm"));
 
-            Serial.print(F("SNR:\t\t"));
-            Serial.print(radio.getSNR());
-            Serial.println(F(" dB"));
+            // Serial.print(F("SNR:\t\t"));
+            // Serial.print(radio.getSNR());
+            // Serial.println(F(" dB"));
 
-            Serial.print(F("Frequency error:\t"));
-            Serial.print(radio.getFrequencyError());
-            Serial.println(F(" Hz"));
+            // Serial.print(F("Frequency error:\t"));
+            // Serial.print(radio.getFrequencyError());
+            // Serial.println(F(" Hz"));
             #ifdef HAS_DISPLAY
                 if (u8g2) {
                     char buf[256];
