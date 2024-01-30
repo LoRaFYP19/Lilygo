@@ -135,8 +135,10 @@ void sendPacket()
         transmissionState = radio.startTransmit(txpacket);
         Serial.println("The txpacket is: ");
         Serial.println(txpacket);
-
+        // extract the tMili from the tx packet from the ',' onwards please
         String str = txpacket;
+        str = str.substring(str.indexOf(',') + 1);
+    
         int64_t rxMili = 0;
                 for (int i = 0; i < str.length(); i++) {
                     char hex_digit = str[i];
@@ -152,7 +154,8 @@ void sendPacket()
         else if(txNumber <= maxNumOfPackets + 10){
       
         // sprintf(txpacket,"Tx Done");  //start a package
-        sprintf(txpacket, "%s, Node ID: %d", "Tx Done", nodeID);
+        // sprintf(txpacket, "%s, Node ID: %d", "Tx Done", nodeID);
+        snprintf(txpacket, sizeof(txpacket), "%d,Tx Done", nodeID);
         Serial.println("Done Payloads sending Tx Done");
         Serial.println(txpacket);
         transmissionState = radio.startTransmit(txpacket);
