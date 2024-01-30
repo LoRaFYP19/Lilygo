@@ -172,11 +172,11 @@ void sendDataToSheet(int nodeId) {
         //                     "&nodeId=" + String(nodeId) + "&...";
         String serverPath = serverName + "?SF=" + String(SpreadF) + "&txP=" + String(OPower) + "&tolRxNum=" + String(nodeStates[nodeId].rxNumber) +
                     "&nodeId=" + String(mynodeId) + "&rxNodeId=" + String(nodeId) +
-                    "&maxRSSI=" + String(nodeStates[nodeId].maxRSSI) + "&minRSSI=" + String(nodeStates[nodeId].minRSSI) +
-                    "&totalTimeOnAir=" + String(nodeStates[nodeId].totalTimeOnAir) +
-                    "&avgTimeOnAir=" + String(nodeStates[nodeId].totalTimeOnAir / nodeStates[nodeId].rxNumber) +
-                    "&minTimeOnAir=" + String(nodeStates[nodeId].minTimeOnAir) +
-                    "&maxTimeOnAir=" + String(nodeStates[nodeId].maxTimeOnAir) +
+                    "&avgRssi=" +String(nodeStates[nodeId].tolRSSI / nodeStates[nodeId].rxNumber)+
+                    "&maxRssi=" + String(nodeStates[nodeId].maxRSSI) + "&minRssi=" + String(nodeStates[nodeId].minRSSI) +
+                    "&avgtoa=" + String(nodeStates[nodeId].totalTimeOnAir / nodeStates[nodeId].rxNumber) +
+                    "&minton=" + String(nodeStates[nodeId].minTimeOnAir) +
+                    "&maxton=" + String(nodeStates[nodeId].maxTimeOnAir) +
                     "&avgSNR=" + String(nodeStates[nodeId].totalSnr / nodeStates[nodeId].rxNumber) +
                     "&avgFrequencyError=" + String(nodeStates[nodeId].tolFrqError / nodeStates[nodeId].rxNumber);
 
@@ -277,6 +277,7 @@ void loop()
 
                 else{
                   Serial.println("Data is already sent to sheet");
+                  radio.setDio0Action(setFlag, RISING);
                 }
             }
             else{
