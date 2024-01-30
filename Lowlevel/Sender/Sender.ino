@@ -151,7 +151,8 @@ void sendPacket()
 
         else if(txNumber <= maxNumOfPackets + 10){
       
-        sprintf(txpacket,"Tx Done");  //start a package
+        // sprintf(txpacket,"Tx Done");  //start a package
+        sprintf(txpacket, "%s, Node ID: %d", "Tx Done", nodeID);
         Serial.println("Done Payloads sending Tx Done");
         Serial.println(txpacket);
         transmissionState = radio.startTransmit(txpacket);
