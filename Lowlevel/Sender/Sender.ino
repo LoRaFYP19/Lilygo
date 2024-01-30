@@ -15,9 +15,10 @@ const char* ssid = "F1";
 const char* password = "123456789";
 int txNumber=0;
 
+unsigned long previousMillis = 0;
+unsigned long interval;
 
-
-#define IntervalForSend 4000
+// #define IntervalForSend 4000
 
 // flag to indicate that a packet was sent
 volatile bool transmittedFlag = false;
@@ -34,6 +35,12 @@ void setFlag(void)
     // we sent a packet, set the flag
     transmittedFlag = true;
 }
+
+void generateRandomInterval() {
+  // Generate a random number between 5000 and 9000 milliseconds (5 to 9 seconds)
+  interval = random(5000, 9001);
+}
+
 
 void setup()
 {
@@ -52,7 +59,8 @@ void setup()
     Serial.println("");
     Serial.print("Connected to WiFi network with IP Address: ");
     Serial.println(WiFi.localIP());
-    
+    randomSeed(analogRead(0));  // Seed the random number generator
+    generateRandomInterval();
     setInterval(60);
     
     waitForSync();
@@ -159,8 +167,10 @@ void sendPacket()
     
 }
 
+
 void loop()
 {
+    unsigned long currentMillis = millis();
     events();
     // check if the previous transmission finished
     if (transmittedFlag) {
@@ -210,7 +220,16 @@ void loop()
     }
     
     // send packet every 2 seconds using milis()
-    if (millis() % IntervalForSend == 0) {
-        sendPacket();
-    }
+    // if (millis() % IntervalForSend == 0) {
+        
+    //     sendPacket();
+    // }
+    if (currentMillis - previousMillis >= interval) {
+    // Trigger your action here
+    sendPacket();
+    // Reset the timer and generate a new random interval
+    previousMillis = currentMillis;
+    generateRandomInterval();
+  }
+
 }
