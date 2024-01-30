@@ -93,7 +93,7 @@ void setup()
         radio.setOutputPower(17);
         radio.setBandwidth(125);
         radio.setCurrentLimit(120);
-        radio.setSpreadingFactor(12);
+        radio.setSpreadingFactor(8);
     } else {
         Serial.print(F("failed, code "));
         Serial.println(state);
