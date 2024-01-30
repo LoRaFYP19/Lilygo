@@ -291,10 +291,11 @@ void loop()
                 Serial.println(rxMili);
 
                 nodeStates[nodeId].txSheet = false;
-                // rxNumber++;
-                nodeStates[nodeId].rxNumber++;
+                
+                nodeStates[nodeId].rxNumber = nodeStates[nodeId].rxNumber + 1;
+                // Serial.println(nodeStates[nodeId].rxNumber);
                 int64_t rssi = radio.getRSSI();
-                // tolRSSI += rssi;
+                
                 nodeStates[nodeId].tolRSSI += rssi;
 
                 if (rssi > nodeStates[nodeId].maxRSSI) {
@@ -325,8 +326,6 @@ void loop()
                 // Example: Update tolFrqError for the specific nodeId
                 int64_t FrqError = radio.getFrequencyError();
                 nodeStates[nodeId].tolFrqError += FrqError;
-
-
             }
 
 #ifdef HAS_DISPLAY
