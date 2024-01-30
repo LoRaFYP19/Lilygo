@@ -28,7 +28,7 @@ volatile bool enableInterrupt = true;
 #define MAX_NODES 2 // Adjust this based on the maximum number of nodeIds
 
 //Your Domain name with URL path or IP address with path
-String serverName = "https://script.google.com/macros/s/AKfycbzmBz3kstwiNjQVGuUoN_GEmpV8hnVNwppzb4oytaz1lWB4em3UliuXozVI1Pmg2BRvNA/exec";
+String serverName = "https://script.google.com/macros/s/AKfycbyNPdT4ZHuWGiA_m3f-L7kqQaZe5OmHifijYdO3fwsdYiF765ahJVJn86Tah4qGHaZIYw/exec";
 
 
 struct NodeState {
@@ -104,7 +104,6 @@ void setup()
     // int msec_1 = (val_1.substring(27,30)).toInt();
     Serial.println(val_1);
     // rxNumber=0;
-    rssi=0;
 
 
     // initialize SX1276 with default settings
@@ -271,7 +270,7 @@ void loop()
             if(strcmp(time.c_str(),"Tx Done")==0){
                 radio.clearDio0Action();
                 Serial.println("Test is Done");
-                Serial.println("SF "+String(SpreadF)+" Output Power: "+String(OPower) +" Total Rx Number: " + String(rxNumber) + " Average RSSI: " + String(tolRSSI/rxNumber) + " Max RSSI: " + String(maxRSSI) + " Min RSSI: " + String(minRSSI) + " Total Time on Air: " + String(totalTimeOnAir)+ " Average Time On Air: "+ String(totalTimeOnAir/rxNumber) + " Min Time on Air: " + String(minTimeOnAir) + " Max Time on Air: " + String(maxTimeOnAir)+" Average SNR: "+String(totalSnr/rxNumber)+" Average Frequency Error: "+String(tolFrqError/rxNumber));
+                // Serial.println("SF "+String(SpreadF)+" Output Power: "+String(OPower) +" Total Rx Number: " + String(rxNumber) + " Average RSSI: " + String(tolRSSI/rxNumber) + " Max RSSI: " + String(maxRSSI) + " Min RSSI: " + String(minRSSI) + " Total Time on Air: " + String(totalTimeOnAir)+ " Average Time On Air: "+ String(totalTimeOnAir/rxNumber) + " Min Time on Air: " + String(minTimeOnAir) + " Max Time on Air: " + String(maxTimeOnAir)+" Average SNR: "+String(totalSnr/rxNumber)+" Average Frequency Error: "+String(tolFrqError/rxNumber));
                 if (!nodeStates[nodeId].txSheet) {
                     sendDataToSheet(nodeId);
                 }
@@ -283,7 +282,7 @@ void loop()
             else{
 
                 int64_t rxMili = 0;
-                Serial.println(rxNumber);
+                Serial.println(nodeStates[nodeId].rxNumber);
                 for (int i = 0; i < time.length(); i++) {
                     char hex_digit = time[i];
                     int digit_value = (hex_digit >= '0' && hex_digit <= '9') ? hex_digit - '0' : hex_digit - 'a' + 10;
@@ -291,10 +290,10 @@ void loop()
                 }
                 Serial.println(rxMili);
 
-                txSheet = false;
+                nodeStates[nodeId].txSheet = false;
                 // rxNumber++;
                 nodeStates[nodeId].rxNumber++;
-                rssi = radio.getRSSI();
+                int64_t rssi = radio.getRSSI();
                 // tolRSSI += rssi;
                 nodeStates[nodeId].tolRSSI += rssi;
 
