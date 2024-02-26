@@ -1,7 +1,6 @@
 #include <RadioLib.h>
 #include "boards.h"
-// #include <ezTime.h>
-// #include <WiFi.h>
+
 
 
 SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
@@ -11,14 +10,10 @@ SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUS
 // save transmission state between loops
 int transmissionState = RADIOLIB_ERR_NONE;
 int maxNumOfPackets =100;
-// const char* ssid = "F1";
-// const char* password = "123456789";
 int txNumber=0;
 
 unsigned long previousMillis = 0;
 unsigned long interval;
-
-// #define IntervalForSend 4000
 
 // flag to indicate that a packet was sent
 volatile bool transmittedFlag = false;
@@ -49,25 +44,9 @@ void setup()
     // When the power is turned on, a delay is required.
     delay(1500);
 
-    // WiFi.begin(ssid, password);
-    // Serial.println("Connecting");
-    // while(WiFi.status() != WL_CONNECTED) {
-    //   delay(500);
-    //   Serial.print(".");
-    // }
-    // delay(5000);
-    // Serial.println("");
-    // Serial.print("Connected to WiFi network with IP Address: ");
-    // Serial.println(WiFi.localIP());
     randomSeed(analogRead(0));  // Seed the random number generator
     generateRandomInterval();
-    // setInterval(60);
-    
-//    waitForSync();
-//    String val_1 = UTC.dateTime("l, d-M-y H:i:s.v T");
 
-//    Serial.println(val_1);
-    
     txNumber=0;
 
     // initialize SX1276 with default settings
@@ -106,24 +85,21 @@ void setup()
 }
 
 void int64ToHexString(int64_t value, char* buffer, size_t size) {
-    // snprintf(buffer, size, "%llx", static_cast<unsigned long long>(value)); //  for defualt payload
-    snprintf(buffer, size, "%d,%llx", nodeID, static_cast<unsigned long long>(value)); // payload with node ID
+    // snprintf(buffer, size, "%llx", static_cast<unsigned long long>(value)); // for default payload
+    
+    snprintf(buffer, size, "%d,%09llx", nodeID, static_cast<unsigned long long>(value)); // payload with node ID and padded value
 }
-
 
 void sendPacket()
 {
     // send packet
     txNumber++;
-    // Serial.println("Trying to send the packet number: ");
-    // Serial.println(txNumber);
+
     char txpacket[20];
     if (txNumber <= maxNumOfPackets)
     {
-        int64_t tMili = 888+20*60000+10*3600000; //(UTC.dateTime("sv")).toInt() + (UTC.dateTime("i")).toInt() * 60000 + (UTC.dateTime("H")).toInt() * 3600000;
-        // Serial.println("The tMili is: ");
-        // Serial.println(tMili);
-        
+        // int64_t tMili = 888+20*60000+10*3600000; //(UTC.dateTime("sv")).toInt() + (UTC.dateTime("i")).toInt() * 60000 + (UTC.dateTime("H")).toInt() * 3600000;
+        int64_t tMili = txNumber;
 
        
         int64ToHexString(tMili, txpacket, sizeof(txpacket));
@@ -131,31 +107,15 @@ void sendPacket()
      
 
         transmissionState = radio.startTransmit(txpacket);
-        // Serial.println("The txpacket is: ");
-//         Serial.println(txpacket);
-        // extract the tMili from the tx packet from the ',' onwards please
         String str = txpacket;
         Serial.println(str+","+String(txNumber)+","+nodeID);
-        // str = str.substring(str.indexOf(',') + 1);
-    
-        // int64_t rxMili = 0;
-        //         for (int i = 0; i < str.length(); i++) {
-        //             char hex_digit = str[i];
-        //             int digit_value = (hex_digit >= '0' && hex_digit <= '9') ? hex_digit - '0' : hex_digit - 'a' + 10;
-        //             rxMili = (rxMili << 4) | digit_value;
-        //         }
-
-        // Serial.println("The decoded integer is ");
-        // Serial.println(rxMili);
+       
 
     }
 
         else if(txNumber <= maxNumOfPackets + 10){
       
-        // sprintf(txpacket,"Tx Done");  //start a package
-        // sprintf(txpacket, "%s, Node ID: %d", "Tx Done", nodeID);
         snprintf(txpacket, sizeof(txpacket), "%d,Tx Done", nodeID);
-        // Serial.println("Done Payloads sending Tx Done");
         Serial.println(txpacket);
         transmissionState = radio.startTransmit(txpacket);
         delay(3000); // additionnal delay to be sure that the receiver got the message without spaming the channel
@@ -184,8 +144,6 @@ void loop()
         transmittedFlag = false;
 
         if (transmissionState == RADIOLIB_ERR_NONE) {
-            // packet was successfully sent
-            // Serial.println(txNumber);
             Serial.println(F("packet got transmission finished!"));
 
             // NOTE: when using interrupt-driven transmit method,
@@ -204,8 +162,6 @@ void loop()
         // this will ensure transmitter is disabled,
         // RF switch is powered down etc.
         radio.finishTransmit();
-
-        // you can transmit C-string or Arduino string up to
         
 
 #ifdef HAS_DISPLAY
@@ -223,15 +179,10 @@ void loop()
         enableInterrupt = true;
     }
     
-    // send packet every 2 seconds using milis()
-    // if (millis() % IntervalForSend == 0) {
-        
-    //     sendPacket();
-    // }
+
     if (currentMillis - previousMillis >= interval) {
     // Trigger your action here
     sendPacket();
-    // Reset the timer and generate a new random interval
     previousMillis = currentMillis;
     generateRandomInterval();
   }
