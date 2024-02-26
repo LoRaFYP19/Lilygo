@@ -9,26 +9,20 @@
 SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 
 #define LoRa_frequency 923.0
-#define SpreadF 12
-#define OPower 17
+#define SpreadF 11
+#define OPower 19
 #define Bandwidth 125
 #define CurrentLimit 120
 #define PreAmbleLength 6
 
 // flag to indicate my node id
-#define mynodeId 2
-
-// const char* ssid = "F1";
-// const char* password = "123456789";
+#define mynodeId 0
 
 volatile bool receivedFlag = false;
 
 // disable interrupt when it's not needed
 volatile bool enableInterrupt = true;
 #define MAX_NODES 2 // Adjust this based on the maximum number of nodeIds
-
-//Your Domain name with URL path or IP address with path
-//String serverName = "https://script.google.com/macros/s/AKfycbyNPdT4ZHuWGiA_m3f-L7kqQaZe5OmHifijYdO3fwsdYiF765ahJVJn86Tah4qGHaZIYw/exec";
 
 
 struct NodeState {
@@ -84,27 +78,6 @@ void setup()
     initBoard();
     // When the power is turned on, a delay is required.
     delay(1500);
-    // WiFi.disconnect();
-    // delay(1000);
-    // WiFi.begin(ssid, password);
-    // Serial.println("Connecting");
-    // while(WiFi.status() != WL_CONNECTED) {
-    //   delay(500);
-    //   Serial.print(".");
-    // }
-
-    // Serial.println("");
-    // Serial.print("Connected to WiFi network with IP Address: ");
-    // Serial.println(WiFi.localIP());
-
-    // setInterval(60);
-    // waitForSync();
-    // String val_1 = UTC.dateTime("l, d-M-y H:i:s.v T");
-    // // int sec_1 = (val_1.substring(24,27)).toInt();
-    // // int msec_1 = (val_1.substring(27,30)).toInt();
-    // Serial.println(val_1);
-    // rxNumber=0;
-
 
     // initialize SX1276 with default settings
     Serial.print(F("Initializing ... "));
@@ -155,81 +128,6 @@ void setup()
 }
 
 
-// void sendDataToSheet(int nodeId) {
-//     Serial.println("Sending the Data");
-
-//     if (WiFi.status() != WL_CONNECTED) {
-//         WiFi.disconnect();
-//         delay(1000);
-//         WiFi.begin(ssid, password);
-//     }
-
-//     if (WiFi.status() == WL_CONNECTED) {
-//         HTTPClient http;
-
-//         // Modify the serverPath accordingly based on the nodeId
-//         // String serverPath = serverName + "?SF=" + String(SpreadF) + "&txP=" + String(OPower) + "&tolRxNum=" + String(nodeStates[nodeId].rxNumber) +
-//         //                     "&nodeId=" + String(nodeId) + "&...";
-//         String serverPath = serverName + "?SF=" + String(SpreadF) + "&txP=" + String(OPower) + "&tolRxNum=" + String(nodeStates[nodeId].rxNumber) +
-//                     "&nodeId=" + String(mynodeId) + "&rxNodeId=" + String(nodeId) +
-//                     "&avgRssi=" +String(nodeStates[nodeId].tolRSSI / nodeStates[nodeId].rxNumber)+
-//                     "&maxRssi=" + String(nodeStates[nodeId].maxRSSI) + "&minRssi=" + String(nodeStates[nodeId].minRSSI) +
-//                     "&avgtoa=" + String(nodeStates[nodeId].totalTimeOnAir / nodeStates[nodeId].rxNumber) +
-//                     "&minton=" + String(nodeStates[nodeId].minTimeOnAir) +
-//                     "&maxton=" + String(nodeStates[nodeId].maxTimeOnAir) +
-//                     "&avgSNR=" + String(nodeStates[nodeId].totalSnr / nodeStates[nodeId].rxNumber) +
-//                     "&avgFrequencyError=" + String(nodeStates[nodeId].tolFrqError / nodeStates[nodeId].rxNumber);
-
-
-//         Serial.println("SF " + String(SpreadF) + " Output Power: " + String(OPower) +
-//                " Total Rx Number: " + String(nodeStates[nodeId].rxNumber) +
-//                " Average RSSI: " + String(nodeStates[nodeId].tolRSSI / nodeStates[nodeId].rxNumber) +
-//                " Max RSSI: " + String(nodeStates[nodeId].maxRSSI) +
-//                " Min RSSI: " + String(nodeStates[nodeId].minRSSI) +
-//                " Total Time on Air: " + String(nodeStates[nodeId].totalTimeOnAir) +
-//                " Average Time On Air: " + String(nodeStates[nodeId].totalTimeOnAir / nodeStates[nodeId].rxNumber) +
-//                " Min Time on Air: " + String(nodeStates[nodeId].minTimeOnAir) +
-//                " Max Time on Air: " + String(nodeStates[nodeId].maxTimeOnAir) +
-//                " Average SNR: " + String(nodeStates[nodeId].totalSnr / nodeStates[nodeId].rxNumber) +
-//                " Average Frequency Error: " + String(nodeStates[nodeId].tolFrqError / nodeStates[nodeId].rxNumber))+
-//                 " NodeId: " + String(mynodeId) + " RxNodeId: " + String(nodeId);
-
-
-
-//         // Your Domain name with URL path or IP address with path
-//         http.begin(serverPath.c_str());
-
-//         int httpResponseCode = http.GET();
-//         if (httpResponseCode > 0) {
-//             Serial.print("HTTP Response code: ");
-//             Serial.println(httpResponseCode);
-//             String payload = http.getString();
-//             Serial.println(payload);
-//             delay(1000);
-
-//             // Reset variables for the specific nodeId
-//             nodeStates[nodeId].txSheet = true;
-//             nodeStates[nodeId].maxRSSI = -1000;
-//             nodeStates[nodeId].minRSSI = 1000;
-//             nodeStates[nodeId].totalTimeOnAir = 0;
-//             nodeStates[nodeId].maxTimeOnAir = 0;
-//             nodeStates[nodeId].tolRSSI = 0;
-//             nodeStates[nodeId].tolrxSize = 0;
-//             nodeStates[nodeId].tolFrqError = 0;
-//             nodeStates[nodeId].totalSnr = 0;
-//         } else {
-//             Serial.print("Error code: ");
-//             Serial.println(httpResponseCode);
-//         }
-
-//         http.end();
-//     } else {
-//         Serial.println("WiFi Disconnected");
-//     }
-
-//     radio.setDio0Action(setFlag, RISING);
-// }
-
 void loop()
 {
     // check if the flag is set
@@ -257,7 +155,6 @@ void loop()
         if (state == RADIOLIB_ERR_NONE) {
             // packet was successfully received
             Serial.println(F("Received packet!"));
-            // int64_t nowMili = (UTC.dateTime("sv")).toInt() + (UTC.dateTime("i")).toInt() * 60000 + (UTC.dateTime("H")).toInt() * 3600000;
 
             // print data of the packet
             Serial.print(F("Data:\t\t"));
@@ -268,31 +165,11 @@ void loop()
             int nodeId = nodeid.toInt();
 
             if(strcmp(time.c_str(),"Tx Done")==0){
-                // radio.clearDio0Action();
                 Serial.println("Test is Done");
-                // Serial.println("SF "+String(SpreadF)+" Output Power: "+String(OPower) +" Total Rx Number: " + String(rxNumber) + " Average RSSI: " + String(tolRSSI/rxNumber) + " Max RSSI: " + String(maxRSSI) + " Min RSSI: " + String(minRSSI) + " Total Time on Air: " + String(totalTimeOnAir)+ " Average Time On Air: "+ String(totalTimeOnAir/rxNumber) + " Min Time on Air: " + String(minTimeOnAir) + " Max Time on Air: " + String(maxTimeOnAir)+" Average SNR: "+String(totalSnr/rxNumber)+" Average Frequency Error: "+String(tolFrqError/rxNumber));
-                // if (!nodeStates[nodeId].txSheet) {
-                //     sendDataToSheet(nodeId);
-                // }
-                // else{
-                //   Serial.println("Data is already sent to sheet");
-                //   radio.setDio0Action(setFlag, RISING);
-                // }
             }
             else{
 
-                // int64_t rxMili = 0;
-                // Serial.println(nodeStates[nodeId].rxNumber);
-                // for (int i = 0; i < time.length(); i++) {
-                //     char hex_digit = time[i];
-                //     int digit_value = (hex_digit >= '0' && hex_digit <= '9') ? hex_digit - '0' : hex_digit - 'a' + 10;
-                //     rxMili = (rxMili << 4) | digit_value;
-                // }
-                // Serial.println(rxMili);
-
-                // nodeStates[nodeId].txSheet = false;
                 nodeStates[nodeId].rxNumber = nodeStates[nodeId].rxNumber + 1;
-                // Serial.println(nodeStates[nodeId].rxNumber);
                 int64_t rssi = radio.getRSSI();
                 nodeStates[nodeId].tolRSSI += rssi;
                 if (rssi > nodeStates[nodeId].maxRSSI) {
@@ -305,17 +182,6 @@ void loop()
                 int64_t rxSize = str.length();
                 nodeStates[nodeId].tolrxSize += rxSize;
 
-                // int64_t defMili = nowMili - rxMili;
-                // nodeStates[nodeId].totalTimeOnAir += defMili;
-                // if (defMili > nodeStates[nodeId].maxTimeOnAir) {
-                //     nodeStates[nodeId].maxTimeOnAir = defMili;
-                // }
-
-                // // Example: Update minTimeOnAir for the specific nodeId
-                // if (defMili < nodeStates[nodeId].minTimeOnAir) {
-                //     nodeStates[nodeId].minTimeOnAir = defMili;
-                // }
-
                 // Example: Update totalSnr for the specific nodeId
                 int64_t Snr = radio.getSNR();
                 nodeStates[nodeId].totalSnr += Snr;
@@ -325,8 +191,6 @@ void loop()
                 nodeStates[nodeId].tolFrqError += FrqError;
                 // serial print all the values separatd by comma
                 Serial.print(str+String(SpreadF)+","+String(OPower)+","+String(nodeStates[nodeId].rxNumber)+","+String(rssi)+","+String(nodeStates[nodeId].maxRSSI)+","+String(nodeStates[nodeId].minRSSI)+","+String(Snr)+","+String(FrqError)+","+String(mynodeId)+","+String(nodeId));
-
-                // Serial.println("SF "+String(SpreadF)+" Output Power: "+String(OPower) +" Total Rx Number: " + String(nodeStates[nodeId].rxNumber) + " Average RSSI: " + String(nodeStates[nodeId].tolRSSI/nodeStates[nodeId].rxNumber) + " Max RSSI: " + String(nodeStates[nodeId].maxRSSI) + " Min RSSI: " + String(nodeStates[nodeId].minRSSI) + " Total Time on Air: " + String(nodeStates[nodeId].totalTimeOnAir)+ " Average Time On Air: "+ String(nodeStates[nodeId].totalTimeOnAir/nodeStates[nodeId].rxNumber) + " Min Time on Air: " + String(nodeStates[nodeId].minTimeOnAir) + " Max Time on Air: " + String(nodeStates[nodeId].maxTimeOnAir)+" Average SNR: "+String(nodeStates[nodeId].totalSnr/nodeStates[nodeId].rxNumber)+" Average Frequency Error: "+String(nodeStates[nodeId].tolFrqError/nodeStates[nodeId].rxNumber));
             }
 
 #ifdef HAS_DISPLAY
