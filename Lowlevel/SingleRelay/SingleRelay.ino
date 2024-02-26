@@ -1,5 +1,5 @@
 /*
-   RadioLib SX1276 Receive/Transmission Example
+   RadioLib SX1276 Single SF relay node
    with RX interupt/ TX interupt trigger for Lilygo LoRa 2.1_1.6V module.
 */
 
@@ -11,11 +11,10 @@
 SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 
 #define LoRa_frequency 923.0
-#define LoRa_TX_PIN 34 // for TX trigger
-#define Dummy_TX_Inteval 10000 // in ms
-#define Spreadf 7
-#define repeatSF 8
 
+#define Spreadf 8
+#define repeatSF 7
+int crcErrors=0;
 int numberofpackets=0;
 String str;
 
@@ -149,18 +148,6 @@ void loop(){
             Serial.println(str);
             Serial.println(numberofpackets);
             
-            // // print RSSI, SNR and frequency offset
-            // Serial.print(F("RSSI:\t\t"));
-            // Serial.print(radio.getRSSI());
-            // Serial.println(F(" dBm"));
-
-            // Serial.print(F("SNR:\t\t"));
-            // Serial.print(radio.getSNR());
-            // Serial.println(F(" dB"));
-
-            // Serial.print(F("Frequency error:\t"));
-            // Serial.print(radio.getFrequencyError());
-            // Serial.println(F(" Hz"));
             #ifdef HAS_DISPLAY
                 if (u8g2) {
                     char buf[256];
@@ -181,6 +168,8 @@ void loop(){
         else if (receptionstate == RADIOLIB_ERR_CRC_MISMATCH){
             // packet was received, but is malformed
             Serial.println(F("CRC error!"));
+            crcErrors = crcErrors +1;
+            Serial.println(crcErrors);
         }
         else{
             Serial.print(F("Failed, code "));
