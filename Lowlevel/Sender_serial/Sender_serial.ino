@@ -7,6 +7,7 @@ SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUS
 
 #define LoRa_frequency 923.0
 #define nodeID 0
+#define wanSync 0x34
 // save transmission state between loops
 int transmissionState = RADIOLIB_ERR_NONE;
 int maxNumOfPackets =100;
@@ -73,6 +74,7 @@ void setup()
         radio.setBandwidth(125);
         radio.setCurrentLimit(120);
         radio.setSpreadingFactor(8);
+        radio.setSyncWord(wanSync)
     } else {
         Serial.print(F("failed, code "));
         Serial.println(state);
