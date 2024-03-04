@@ -8,7 +8,7 @@ SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUS
 #define LoRa_frequency 923.0
 #define nodeID 0
 #define wanSync 0x34
-#define sf 8
+#define sf 12
 #define tx_pow 19
 #define bw 125
 
@@ -19,6 +19,9 @@ int txNumber=0;
 
 unsigned long previousMillis = 0;
 unsigned long interval;
+
+volatile unsigned long startTime;
+volatile unsigned long endTime;
 
 // flag to indicate that a packet was sent
 volatile bool transmittedFlag = false;
@@ -33,7 +36,9 @@ void setFlag(void)
         return;
     }
     // we sent a packet, set the flag
+
     transmittedFlag = true;
+    endTime = millis();
 }
 
 void generateRandomInterval() {
@@ -110,19 +115,18 @@ void sendPacket()
        
         int64ToHexString(tMili, txpacket, sizeof(txpacket));
         // add the node ID to the packet front with a comma separated
-     
 
+        startTime = millis();
         transmissionState = radio.startTransmit(txpacket);
         String str = txpacket;
         Serial.println(str+","+String(txNumber)+","+nodeID);
-       
-
     }
 
         else if(txNumber <= maxNumOfPackets + 10){
       
         snprintf(txpacket, sizeof(txpacket), "%d,Tx Done", nodeID);
         Serial.println(txpacket);
+        startTime = millis();
         transmissionState = radio.startTransmit(txpacket);
         delay(3000); // additionnal delay to be sure that the receiver got the message without spaming the channel
 
@@ -167,6 +171,8 @@ void loop()
         // clean up after transmission is finished
         // this will ensure transmitter is disabled,
         // RF switch is powered down etc.
+        Serial.print(F("Transmission time: "));
+        Serial.println(endTime - startTime);
         radio.finishTransmit();
         
 
