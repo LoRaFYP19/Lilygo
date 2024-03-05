@@ -9,11 +9,12 @@
 SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 
 #define LoRa_frequency 923.0
-#define SpreadF 11
+#define SpreadF 12
 #define OPower 19
 #define Bandwidth 125
 #define CurrentLimit 120
 #define PreAmbleLength 6
+#define wanSync 0x34
 
 // flag to indicate my node id
 #define mynodeId 0
@@ -22,6 +23,9 @@ volatile bool receivedFlag = false;
 
 // disable interrupt when it's not needed
 volatile bool enableInterrupt = true;
+volatile unsigned long startTime;
+volatile unsigned long endTime;
+
 #define MAX_NODES 2 // Adjust this based on the maximum number of nodeIds
 
 
@@ -63,6 +67,7 @@ NodeState nodeStates[MAX_NODES];
 //            and MUST NOT have any arguments!
 void setFlag(void)
 {
+    startTime = millis();
     // check if the interrupt is enabled
     if (!enableInterrupt) {
         return;
@@ -70,6 +75,8 @@ void setFlag(void)
 
     // we got a packet, set the flag
     receivedFlag = true;
+    
+    
 }
 
 void setup()
@@ -93,6 +100,7 @@ void setup()
         radio.setBandwidth(Bandwidth);
         radio.setCurrentLimit(CurrentLimit);
         radio.setPreambleLength(PreAmbleLength);
+        radio.setSyncWord(wanSync);
     } else {
         Serial.print(F("failed, code "));
         Serial.println(state);
@@ -102,6 +110,9 @@ void setup()
 
     // when new packet is received, interrupt
     radio.setDio0Action(setFlag, RISING);
+    // set the function that will be called
+    // when LoRa preamble is detected
+    // radio.setDio1Action(setFlagDetected, RISING);
 
     // start listening for LoRa packets
     Serial.print(F("Starting to listen ... "));
@@ -143,6 +154,7 @@ void loop()
         // you can read received data as an Arduino String
         String str;
         int state = radio.readData(str);
+        endTime = millis();
         Serial.print("Initial p rec ");
         Serial.print(str);
 
@@ -189,8 +201,12 @@ void loop()
                 // Example: Update tolFrqError for the specific nodeId
                 int64_t FrqError = radio.getFrequencyError();
                 nodeStates[nodeId].tolFrqError += FrqError;
+//                Serial.println("Time TX: ");
+//                Serial.print(endTime);
+//                Serial.print(",");
+//                Serial.print(startTime);
                 // serial print all the values separatd by comma
-                Serial.print(str+String(SpreadF)+","+String(OPower)+","+String(nodeStates[nodeId].rxNumber)+","+String(rssi)+","+String(nodeStates[nodeId].maxRSSI)+","+String(nodeStates[nodeId].minRSSI)+","+String(Snr)+","+String(FrqError)+","+String(mynodeId)+","+String(nodeId));
+                Serial.println(str+","+String(SpreadF)+","+String(OPower)+","+String(nodeStates[nodeId].rxNumber)+","+String(rssi)+","+String(nodeStates[nodeId].maxRSSI)+","+String(nodeStates[nodeId].minRSSI)+","+String(Snr)+","+String(FrqError)+","+String(mynodeId)+","+String(nodeId));
             }
 
 #ifdef HAS_DISPLAY
