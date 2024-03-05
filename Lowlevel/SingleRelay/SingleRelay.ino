@@ -14,6 +14,9 @@ SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUS
 
 #define Spreadf 8
 #define repeatSF 7
+#define PreAmbleLength 6
+#define wanSync 0x34
+
 int crcErrors=0;
 int numberofpackets=0;
 String str;
@@ -61,9 +64,11 @@ void setup()
     if (state == RADIOLIB_ERR_NONE) {
         Serial.println(F("success!"));
         radio.setSpreadingFactor(Spreadf);
-        radio.setOutputPower(17);
+        radio.setOutputPower(19);
         radio.setBandwidth(125);
         radio.setCurrentLimit(120);
+        radio.setSyncWord(wanSync);
+        radio.setPreambleLength(PreAmbleLength);
     } else {
         Serial.print(F("failed, code "));
         Serial.println(state);
@@ -147,7 +152,10 @@ void loop(){
             numberofpackets++;
             Serial.println(str);
             Serial.println(numberofpackets);
-            
+            int64_t rssi = radio.getRSSI(); 
+            int64_t snr = radio.getSNR();
+            int64_t FrqError = radio.getFrequencyError();
+            Serial.println(str+","+String(numberofpackets)+","+String(rssi)+","+String(snr)+","+String(FrqError));
             #ifdef HAS_DISPLAY
                 if (u8g2) {
                     char buf[256];
@@ -182,4 +190,3 @@ void loop(){
  enableInterrupt = true;
 
 }
-
