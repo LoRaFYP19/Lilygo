@@ -172,7 +172,8 @@ void loop()
         // this will ensure transmitter is disabled,
         // RF switch is powered down etc.
         Serial.print(F("Transmission time: "));
-        Serial.println(endTime - startTime);
+        Serial.print(endTime - startTime);
+        Serial.println();
         radio.finishTransmit();
         
 
