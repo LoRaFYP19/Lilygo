@@ -9,8 +9,8 @@
 SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 
 #define LoRa_frequency 923.0
-#define SpreadF 12
-#define OPower 19
+#define SpreadF 8
+#define OPower 2
 #define Bandwidth 125
 #define CurrentLimit 120
 #define PreAmbleLength 6
