@@ -9,7 +9,7 @@ SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUS
 #define nodeID 0
 #define wanSync 0x34
 #define sf 12
-#define tx_pow 19
+#define tx_pow 17
 #define bw 125
 
 // save transmission state between loops
@@ -79,11 +79,13 @@ void setup()
 
     if (state == RADIOLIB_ERR_NONE) {
         Serial.println(F("success!"));
-        radio.setOutputPower(tx_pow);
+        int txState = radio.setOutputPower(tx_pow);
         radio.setBandwidth(bw);
         radio.setCurrentLimit(120);
         radio.setSpreadingFactor(sf);
         radio.setSyncWord(wanSync);
+        Serial.println("Tx State" );
+        Serial.println(txState);
     } else {
         Serial.print(F("failed, code "));
         Serial.println(state);
