@@ -8,18 +8,28 @@
 #include "utilities.h"
 #include "boards.h"
 
+
+
 SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 
 #define LoRa_frequency 923.0
 
 #define Spreadf 8
-#define repeatSF 7
+#define repeatSF 8
 #define PreAmbleLength 6
 #define wanSync 0x34
+
+// Queue buffer
+#define MAX_PACKETS 5
+String packetBuffer[MAX_PACKETS];
+int head = 0;
+int tail = 0;
+
 
 int crcErrors=0;
 int numberofpackets=0;
 String str;
+
 
 volatile bool actionFlag = false; // Flag to indicate that a packet was received or sent
 volatile bool isTransmitting = false; // Flag to identify TX or RX
@@ -40,12 +50,23 @@ void handleInterrupt() {
 }
 
 void startTransmission() {
+    // Check if the packet already exists in the buffer
+    for (int i = 0; i < MAX_PACKETS; i++) {
+        if (packetBuffer[i] == str) {
+            // Skip transmission
+            Serial.println("Duplicate packet, skipping transmission");
+            return;
+        }
+    }
+
     Serial.print(F("Sending back ... "));
     isTransmitting = true;
+    // add the str to the cache
     radio.setSpreadingFactor(repeatSF);
     //transmissionState = radio.startTransmit("Hello World!"); // this is non-blocking action, meaning the radio is transmitting, the execution of other tasks are not on hold
     transmissionState = radio.startTransmit(str); // this is non-blocking action, meaning the radio is transmitting, the execution of other tasks are not on hold
-
+    packetBuffer[head] = str;
+    head = (head + 1) % MAX_PACKETS;
 }
 
 void setup()
@@ -64,7 +85,7 @@ void setup()
     if (state == RADIOLIB_ERR_NONE) {
         Serial.println(F("success!"));
         radio.setSpreadingFactor(Spreadf);
-        radio.setOutputPower(19);
+        radio.setOutputPower(2);
         radio.setBandwidth(125);
         radio.setCurrentLimit(120);
         radio.setSyncWord(wanSync);
@@ -190,3 +211,4 @@ void loop(){
  enableInterrupt = true;
 
 }
+
