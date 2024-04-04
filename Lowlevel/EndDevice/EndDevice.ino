@@ -3,8 +3,6 @@
 #include "utilities.h"
 #include "boards.h"
 
-
-
 SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUSY_PIN);
 
 #define LoRa_frequency 923.0
@@ -16,8 +14,28 @@ SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUS
 
 int Spreadf= 8;
 int OutputPower = 2;
-int Bandwidth = 125;
+float Bandwidth = 125;
 int codeRate = 5;
+
+int oldSpreadf = Spreadf;
+int oldOutputPower = OutputPower;
+int oldBandwidth = Bandwidth;
+int oldcoderate = codeRate;
+
+
+unsigned long previousMillis = 0;
+unsigned long interval;
+bool scheduled = false;
+String PrevReconfString;
+bool retxSch=false;
+
+
+
+unsigned long previousMillis_health = 0;
+unsigned long interval_health;
+bool scheduled_health = false;
+
+
 
 
 int crcErrors=0;
@@ -29,6 +47,7 @@ bool EarthQuack = false;
 volatile bool actionFlag = false; // Flag to indicate that a packet was received or sent
 volatile bool isTransmitting = false; // Flag to identify TX or RX
 volatile bool enableInterrupt = true; // Flag to enable interrupt
+
 
 // unsigned long previousTransmissionTime = 0; // Variable to store the previous transmission time
 
@@ -43,6 +62,27 @@ void handleInterrupt() {
 
     actionFlag = true;
 }
+
+/**
+ * Function to generate a random interval between two hardcoded values.
+ */
+void generateRandomInterval() {
+  
+  interval = random(5000, 10001);
+  
+}
+
+
+/**
+ * Function to generate a random interval between two hardcoded values.
+ */
+void generateRandomInterval_health() {
+  
+  interval_health = random(8000, 12001);
+  
+}
+
+
 
 /**
  * Converts a Decimal value to a hexadecimal string with optional node ID and padding.
@@ -63,7 +103,7 @@ void int64ToHexString(int64_t value, char* buffer, size_t size) {
 
 
 /**
- * Function to start transmission.
+ * Function to start transmission when a earthquack is detected.
  *
  * @param None
  *
@@ -75,13 +115,56 @@ void startTransmission() {
     Serial.print(F("Sending Warning ... "));
     isTransmitting = true;
     char txpacket[20];
-    int64_t tMili = 1888+20*60000+10*3600000; // placeholder
+    int64_t tMili = 1888+20*60000+10*3600000; // placeholder timestamp
     int64ToHexString(tMili, txpacket, sizeof(txpacket));
     transmissionState = radio.startTransmit(txpacket); // this is non-blocking action, meaning the radio is transmitting, the execution of other tasks are not on hold
 }
 
+
 /**
- * Sets up the LoRa radio module with the specified parameters.
+ * Transmits the previous configuration parameters incase some nodes missed the transmission.
+ * @param None
+ *
+ * @return None
+ *
+ * @throws None
+ */
+void startReconfigTransmission() {
+    Serial.print(F("Re-sending Warning ... "));
+    isTransmitting = true;
+    char txpacket[20];
+    sprintf(txpacket, "%s", PrevReconfString.c_str());
+    transmissionState = radio.startTransmit(txpacket); // this is non-blocking action, meaning the radio is transmitting, the execution of other tasks are not on hold
+}
+
+
+void startHealthTransmission() {
+    Serial.print(F("Sending Health Ping ... "));
+    isTransmitting = true;
+    String myString = "%%";
+    myString += String(nodeID);
+    char txpacket[20];
+    sprintf(txpacket, "%s", myString.c_str());
+    transmissionState = radio.startTransmit(txpacket); // this is non-blocking action, meaning the radio is transmitting, the execution of other tasks are not on hold
+}
+
+/**
+ * Sets up the LoRa module with the old configuration parameters.
+ * @param None
+ *
+ * @return None
+ *
+ * @throws None
+ */
+void setup_old_lora(){
+        radio.setSpreadingFactor(oldSpreadf);
+        radio.setOutputPower(oldOutputPower);
+        radio.setBandwidth(oldBandwidth);
+        radio.setCodingRate(oldcoderate);
+}
+
+/**
+ * Sets up the LoRa radio module with the specified parameters. Will call after reconfiguring the parameters
  *
  * @param None
  *
@@ -152,6 +235,12 @@ float select_params(char c, int index) {
 void set_params_lora(String str){
     // for loop for chars from 2 onward
     for (int i = 2; i < str.length(); i++) {
+        // store old values
+        oldSpreadf = Spreadf;
+        oldOutputPower = OutputPower;
+        oldBandwidth = Bandwidth;
+        oldcoderate = codeRate;
+        
         // select_params
         float val = select_params(str.charAt(i), i);
         if (i == 2)
@@ -171,7 +260,9 @@ void set_params_lora(String str){
             OutputPower = (int)val;
         }
 
-        
+        //for resending parameters
+        PrevReconfString = str;
+        scheduled=true;
         
     }
     
@@ -182,6 +273,10 @@ void setup()
     initBoard();
     // When the power is turned on, a delay is required.
     delay(1500);
+
+    randomSeed(analogRead(0));  // Seed the random number generator
+    generateRandomInterval();
+     generateRandomInterval_health();
 
     // initialize SX1276 with default settings
     Serial.print(F("Initializing ... "));
@@ -232,10 +327,27 @@ void setup()
 
 void loop(){
 
+    unsigned long currentMillis = millis(); // for schaduler
+
     if (EarthQuack == true){
         EarthQuack = false;
         startTransmission();
     }
+
+    if ((scheduled == true) && (currentMillis - previousMillis >= interval)) { // if scheduled and time is reached
+        setup_old_lora();
+        startReconfigTransmission();
+        scheduled = false;
+        retxSch = true;
+
+    }
+
+    if ((scheduled_health == true) && (currentMillis - previousMillis >= interval_health)) { // if scheduled and time is reached
+        startHealthTransmission();
+        scheduled_health = false;
+    }
+
+
     // check if the flag is triggerd
     if (actionFlag){
         
@@ -253,9 +365,17 @@ void loop(){
                 Serial.println(transmissionState);
                 // radio.setSpreadingFactor(Spreadf);
             }
+
+            // if retransmission is done, setup the lora again to original parameters
+            if (retxSch == true) { 
+                retxSch = false;
+                setup_lora();
+            }
+
             // clean up after transmission is finished
             // this will ensure transmitter is disabled,
             // RF switch is powered down etc.
+            
             radio.finishTransmit();
 
             delay(100);
@@ -305,8 +425,53 @@ void loop(){
             if (str[0] == '#' && str[1] == '#'){ // for reconfiguration mode
                 set_params_lora(str);
                 setup_lora();
+                generateRandomInterval();
+                previousMillis = millis(); // this will start countdown for the scheduled re-transmission
+
+                #ifdef HAS_DISPLAY
+                if (u8g2) {
+                    char buf[256];
+                    u8g2->clearBuffer();
+                    u8g2->drawStr(0, 12, "Reconfigure recived!");
+                    u8g2->drawStr(5, 26, str.c_str());
+                    snprintf(buf, sizeof(buf), "RSSI:%.2f", radio.getRSSI());
+                    u8g2->drawStr(0, 40, buf);
+                    snprintf(buf, sizeof(buf), "SNR:%.2f", radio.getSNR());
+                    u8g2->drawStr(0, 54, buf);
+                    u8g2->sendBuffer();
+                }
+                 #endif
+
                 delay(1000);
-                
+            }
+
+            else if(str[0] == '%' && str[1] == '%'){ // for healthcheck.
+                #ifdef HAS_DISPLAY
+
+                 generateRandomInterval_health();
+                 previousMillis_health = millis();
+                 scheduled_health=true;
+
+                if (u8g2) {
+                    char buf[256];
+                    u8g2->clearBuffer();
+                    u8g2->drawStr(0, 12, "Reconfigure recived!");
+                    u8g2->drawStr(5, 26, str.c_str());
+                    snprintf(buf, sizeof(buf), "RSSI:%.2f", radio.getRSSI());
+                    u8g2->drawStr(0, 40, buf);
+                    snprintf(buf, sizeof(buf), "SNR:%.2f", radio.getSNR());
+                    u8g2->drawStr(0, 54, buf);
+                    snprintf(buf, sizeof(buf), "SF:%d", Spreadf);
+                    u8g2->drawStr(0, 68, buf);
+                    snprintf(buf, sizeof(buf), "BW:%d", Bandwidth);
+                    u8g2->drawStr(0, 82, buf);
+                    snprintf(buf, sizeof(buf), "CR:%.2f", codeRate);
+                    u8g2->drawStr(0, 96, buf);
+                    snprintf(buf, sizeof(buf), "TXP: %ddBm", OutputPower);
+                    u8g2->drawStr(0, 110, buf);
+                    u8g2->sendBuffer();
+                }
+                 #endif
             }
 
             delay(100);
