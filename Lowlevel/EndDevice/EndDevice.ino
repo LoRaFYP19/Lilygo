@@ -33,9 +33,8 @@ bool retxSch=false;
 
 unsigned long previousMillis_health = 0;
 unsigned long interval_health;
+unsigned long timeout_health=60000;
 bool scheduled_health = false;
-
-
 
 
 int crcErrors=0;
@@ -276,7 +275,7 @@ void setup()
 
     randomSeed(analogRead(0));  // Seed the random number generator
     generateRandomInterval();
-     generateRandomInterval_health();
+    generateRandomInterval_health();
 
     // initialize SX1276 with default settings
     Serial.print(F("Initializing ... "));
@@ -446,35 +445,29 @@ void loop(){
             }
 
             else if(str[0] == '%' && str[1] == '%'){ // for healthcheck.
-                #ifdef HAS_DISPLAY
+                
+                if(currentMillis - previousMillis_health >= timeout_health){
+                generateRandomInterval_health();
+                previousMillis_health = millis();
+                scheduled_health=true;
+                }
 
-                 generateRandomInterval_health();
-                 previousMillis_health = millis();
-                 scheduled_health=true;
+                #ifdef HAS_DISPLAY
 
                 if (u8g2) {
                     char buf[256];
                     u8g2->clearBuffer();
-                    u8g2->drawStr(0, 12, "Reconfigure recived!");
+                    u8g2->drawStr(0, 12, "Health Ping recived!");
                     u8g2->drawStr(5, 26, str.c_str());
                     snprintf(buf, sizeof(buf), "RSSI:%.2f", radio.getRSSI());
                     u8g2->drawStr(0, 40, buf);
                     snprintf(buf, sizeof(buf), "SNR:%.2f", radio.getSNR());
-                    u8g2->drawStr(0, 54, buf);
-                    snprintf(buf, sizeof(buf), "SF:%d", Spreadf);
-                    u8g2->drawStr(0, 68, buf);
-                    snprintf(buf, sizeof(buf), "BW:%d", Bandwidth);
-                    u8g2->drawStr(0, 82, buf);
-                    snprintf(buf, sizeof(buf), "CR:%.2f", codeRate);
-                    u8g2->drawStr(0, 96, buf);
-                    snprintf(buf, sizeof(buf), "TXP: %ddBm", OutputPower);
-                    u8g2->drawStr(0, 110, buf);
                     u8g2->sendBuffer();
                 }
                  #endif
             }
 
-            delay(100);
+            delay(50);
         }
         else if (receptionstate == RADIOLIB_ERR_CRC_MISMATCH){
             // packet was received, but is malformed
