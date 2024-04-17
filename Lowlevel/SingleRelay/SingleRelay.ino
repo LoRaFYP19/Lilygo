@@ -14,10 +14,25 @@ SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUS
 
 #define LoRa_frequency 923.0
 
-#define Spreadf 8
+unsigned long previousMillis = 0;
+unsigned long timeout=60000;
+
 #define repeatSF 8
 #define PreAmbleLength 6
 #define wanSync 0x34
+
+
+
+int Spreadf= 8;
+int OutputPower = 2;
+float Bandwidth = 125;
+int codeRate = 5;
+
+int oldSpreadf = Spreadf;
+int oldOutputPower = OutputPower;
+int oldBandwidth = Bandwidth;
+int oldcoderate = codeRate;
+
 
 // Queue buffer
 #define MAX_PACKETS 5
@@ -39,6 +54,118 @@ volatile bool enableInterrupt = true; // Flag to enable interrupt
 
 // save transmission state between loops
 int transmissionState = RADIOLIB_ERR_NONE;
+
+
+/**
+ * Sets up the LoRa radio module with the specified parameters. Will call after reconfiguring the parameters
+ *
+ * @param None
+ *
+ * @return None
+ *
+ * @throws None
+ */
+void setup_lora(){
+        radio.setSpreadingFactor(Spreadf);
+        radio.setOutputPower(OutputPower);
+        radio.setBandwidth(Bandwidth);
+        radio.setCodingRate(codeRate);
+}
+
+
+
+
+
+/**
+ * Selects and returns the appropriate parameter based on the given character and index.
+ *
+ * @param c The character used to determine the parameter value.
+ * @param index The index of the parameter to select.
+ *
+ * @return The selected parameter value.
+ *
+ * @throws None
+ */
+float select_params(char c, int index) {
+    if (index == 2) { // for spreading factor
+        int val = c - '0';
+        return val+6;
+    }
+
+    if (index == 3) // Bandwidth
+    {
+        switch(c) {
+            case '1': return 10.4;
+            case '2': return 15.6;
+            case '3': return 20.8;
+            case '4': return 31.25;
+            case '5': return 41.7;
+            case '6': return 62.5;
+            case '7': return 125;
+            case '8': return 250;
+            case '9': return 500;
+            default: return 125;
+        }
+    }
+    if (index == 4) // code rate
+    {
+        return c - '0';
+    }
+
+    if (index == 5) // power
+    {
+        int val = c > '9' ? (c | 0x20) - 'a' + 10 : c - '0';
+        return val + 2;
+    }
+
+}
+
+/**
+ * Set LoRa parameters based on the input string.
+ *
+ * @param str the input string containing parameters
+ *
+ * @return void
+ *
+ * @throws ErrorType if there is an error in setting the parameters
+ */
+void set_params_lora(String str){
+    // for loop for chars from 2 onward
+    for (int i = 2; i < str.length(); i++) {
+        // store old values
+        oldSpreadf = Spreadf;
+        oldOutputPower = OutputPower;
+        oldBandwidth = Bandwidth;
+        oldcoderate = codeRate;
+        
+        // select_params
+        float val = select_params(str.charAt(i), i);
+        if (i == 2)
+        {
+            Spreadf = (int)val;
+        }
+        else if (i==3)
+        {
+            Bandwidth = val;
+        }
+        else if (i==4)
+        {
+            codeRate = (int)val;
+        }
+        else if (i==5)
+        {
+            OutputPower = (int)val;
+        }
+
+        //for resending parameters
+        // PrevReconfString = str;
+        // scheduled=true;
+        
+    }
+    
+}
+
+
 
 // Interrupt handler for both transmit and receive
 void handleInterrupt() {
@@ -63,10 +190,10 @@ void startTransmission() {
     isTransmitting = true;
     // add the str to the cache
     radio.setSpreadingFactor(repeatSF);
-    //transmissionState = radio.startTransmit("Hello World!"); // this is non-blocking action, meaning the radio is transmitting, the execution of other tasks are not on hold
     transmissionState = radio.startTransmit(str); // this is non-blocking action, meaning the radio is transmitting, the execution of other tasks are not on hold
     packetBuffer[head] = str;
     head = (head + 1) % MAX_PACKETS;
+    previousMillis = millis();
 }
 
 void setup()
@@ -123,6 +250,8 @@ void setup()
 
 void loop(){
 
+    unsigned long currentMillis = millis();
+
     // check if the flag is triggerd
     if (actionFlag){
         
@@ -161,6 +290,29 @@ void loop(){
 
             // put module back to listen mode
             radio.startReceive();
+
+
+            if (str[0] == '#' && str[1] == '#'){ // for reconfiguration mode
+                set_params_lora(str);
+                setup_lora();
+                // generateRandomInterval();
+                previousMillis = millis(); // this will start countdown for the scheduled re-transmission
+
+                #ifdef HAS_DISPLAY
+                if (u8g2) {
+                    char buf[256];
+                    u8g2->clearBuffer();
+                    u8g2->drawStr(0, 12, "Reconfigure recived!");
+                    u8g2->drawStr(5, 26, str.c_str());
+                    snprintf(buf, sizeof(buf), "RSSI:%.2f", radio.getRSSI());
+                    u8g2->drawStr(0, 40, buf);
+                    snprintf(buf, sizeof(buf), "SNR:%.2f", radio.getSNR());
+                    u8g2->drawStr(0, 54, buf);
+                    u8g2->sendBuffer();
+                }
+                 #endif
+
+
     }
     else{
         // Triggered by reception
@@ -205,10 +357,16 @@ void loop(){
             Serial.println(receptionstate);
         }
 
+      }
+
     }
+   }
+    enableInterrupt = true;
+     if (currentMillis- previousMillis >= timeout) {
 
+        for (int i=0; i<MAX_PACKETS; i++) {
+            packetBuffer[i] = "";
+        }
+
+    }
 }
- enableInterrupt = true;
-
-}
-
