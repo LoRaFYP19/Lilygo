@@ -553,7 +553,7 @@ void loop(){
             int64_t rssi = radio.getRSSI(); 
             int64_t snr = radio.getSNR();
             int64_t FrqError = radio.getFrequencyError();
-            Strint temp = str+","+String(numberofpackets)+","+String(rssi)+","+String(snr)+","+String(FrqError);
+            String temp = str+","+String(numberofpackets)+","+String(rssi)+","+String(snr)+","+String(FrqError);
             sendData(temp);
             Serial.println(str+","+String(numberofpackets)+","+String(rssi)+","+String(snr)+","+String(FrqError));
 
