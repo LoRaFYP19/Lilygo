@@ -332,7 +332,7 @@ void loop(){
         startTransmission();
     }
 
-    else{
+    else{ // if not EarthQuack, then only check if scheduled or not
 
     if ((scheduled == true) && (currentMillis - previousMillis >= interval) && isTransmitting == false) { // if scheduled and time is reached, and not transmitting
         setup_old_lora();
@@ -345,6 +345,7 @@ void loop(){
     if ((scheduled_health == true) && (currentMillis - previousMillis >= interval_health) && isTransmitting == false) { // if scheduled and time is reached and no current transmissions
         startHealthTransmission();
         scheduled_health = false;
+    }
     }
 
 
@@ -484,7 +485,7 @@ void loop(){
     }
 
  }
-}
+
  enableInterrupt = true;
 
 }
