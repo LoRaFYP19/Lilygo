@@ -36,7 +36,6 @@ unsigned long interval_health;
 unsigned long timeout_health=60000;
 bool scheduled_health = false;
 
-
 int crcErrors=0;
 int numberofpackets=0;
 String str;
@@ -333,7 +332,9 @@ void loop(){
         startTransmission();
     }
 
-    if ((scheduled == true) && (currentMillis - previousMillis >= interval)) { // if scheduled and time is reached
+    else{
+
+    if ((scheduled == true) && (currentMillis - previousMillis >= interval) && isTransmitting == false) { // if scheduled and time is reached, and not transmitting
         setup_old_lora();
         startReconfigTransmission();
         scheduled = false;
@@ -341,7 +342,7 @@ void loop(){
 
     }
 
-    if ((scheduled_health == true) && (currentMillis - previousMillis >= interval_health)) { // if scheduled and time is reached
+    if ((scheduled_health == true) && (currentMillis - previousMillis >= interval_health) && isTransmitting == false) { // if scheduled and time is reached and no current transmissions
         startHealthTransmission();
         scheduled_health = false;
     }
@@ -482,6 +483,7 @@ void loop(){
 
     }
 
+ }
 }
  enableInterrupt = true;
 
