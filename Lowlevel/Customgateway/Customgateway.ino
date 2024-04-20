@@ -141,6 +141,123 @@ void sendData(String payload) {
   publishMessage("CGateway/logdata", payload.c_str());
 }
 
+
+//mqtt reconnect function
+void mqttReconnect() {
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    wifiReconnect();
+    if (client.connect(clientId)) {
+      Serial.print(clientId);
+      Serial.println(" connected");
+      client.subscribe("CGateway/reconfig");
+      client.subscribe("CGateway/health");
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      delay(5000);
+    }
+  }
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * Selects and returns the appropriate parameter based on the given character and index.
+ *
+ * @param c The character used to determine the parameter value.
+ * @param index The index of the parameter to select.
+ *
+ * @return The selected parameter value.
+ *
+ * @throws None
+ */
+float select_params(char c, int index) {
+    if (index == 2) { // for spreading factor
+        int val = c - '0';
+        return val+6;
+    }
+
+    if (index == 3) // Bandwidth
+    {
+        switch(c) {
+            case '1': return 10.4;
+            case '2': return 15.6;
+            case '3': return 20.8;
+            case '4': return 31.25;
+            case '5': return 41.7;
+            case '6': return 62.5;
+            case '7': return 125;
+            case '8': return 250;
+            case '9': return 500;
+            default: return 125;
+        }
+    }
+    if (index == 4) // code rate
+    {
+        return c - '0';
+    }
+
+    if (index == 5) // power
+    {
+        int val = c > '9' ? (c | 0x20) - 'a' + 10 : c - '0';
+        return val + 2;
+    }
+
+}
+
+
+/**
+ * Set LoRa parameters based on the input string.
+ *
+ * @param str the input string containing parameters
+ *
+ * @return void
+ *
+ * @throws ErrorType if there is an error in setting the parameters
+ */
+void set_params_lora(String str){
+    // for loop for chars from 2 onward
+    for (int i = 2; i < str.length(); i++) {
+        // store old values
+        oldSpreadf = Spreadf;
+        oldOutputPower = OutputPower;
+        oldBandwidth = Bandwidth;
+        oldcoderate = codeRate;
+        
+        // select_params
+        float val = select_params(str.charAt(i), i);
+        if (i == 2)
+        {
+            Spreadf = (int)val;
+        }
+        else if (i==3)
+        {
+            Bandwidth = val;
+        }
+        else if (i==4)
+        {
+            codeRate = (int)val;
+        }
+        else if (i==5)
+        {
+            OutputPower = (int)val;
+        }
+
+        //for resending parameters
+        PrevReconfString = str;
+        scheduled=true;
+        
+    }
+    
+}
+
+
+
 // MQTT callback function
 void mqttCallback(char* topic, byte* message, unsigned int length) {
   Serial.print("Message arrived on topic: ");
@@ -172,28 +289,6 @@ void mqttCallback(char* topic, byte* message, unsigned int length) {
   }
 }
 
-//mqtt reconnect function
-void mqttReconnect() {
-  while (!client.connected()) {
-    Serial.print("Attempting MQTT connection...");
-    wifiReconnect();
-    if (client.connect(clientId)) {
-      Serial.print(clientId);
-      Serial.println(" connected");
-      client.subscribe("CGateway/reconfig");
-      client.subscribe("CGateway/health");
-    } else {
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");
-      delay(5000);
-    }
-  }
-}
-
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Interrupt handler for both transmit and receive
 void handleInterrupt() {
@@ -317,95 +412,6 @@ void setup_lora(){
         radio.setOutputPower(OutputPower);
         radio.setBandwidth(Bandwidth);
         radio.setCodingRate(codeRate);
-}
-
-/**
- * Selects and returns the appropriate parameter based on the given character and index.
- *
- * @param c The character used to determine the parameter value.
- * @param index The index of the parameter to select.
- *
- * @return The selected parameter value.
- *
- * @throws None
- */
-float select_params(char c, int index) {
-    if (index == 2) { // for spreading factor
-        int val = c - '0';
-        return val+6;
-    }
-
-    if (index == 3) // Bandwidth
-    {
-        switch(c) {
-            case '1': return 10.4;
-            case '2': return 15.6;
-            case '3': return 20.8;
-            case '4': return 31.25;
-            case '5': return 41.7;
-            case '6': return 62.5;
-            case '7': return 125;
-            case '8': return 250;
-            case '9': return 500;
-            default: return 125;
-        }
-    }
-    if (index == 4) // code rate
-    {
-        return c - '0';
-    }
-
-    if (index == 5) // power
-    {
-        int val = c > '9' ? (c | 0x20) - 'a' + 10 : c - '0';
-        return val + 2;
-    }
-
-}
-
-/**
- * Set LoRa parameters based on the input string.
- *
- * @param str the input string containing parameters
- *
- * @return void
- *
- * @throws ErrorType if there is an error in setting the parameters
- */
-void set_params_lora(String str){
-    // for loop for chars from 2 onward
-    for (int i = 2; i < str.length(); i++) {
-        // store old values
-        oldSpreadf = Spreadf;
-        oldOutputPower = OutputPower;
-        oldBandwidth = Bandwidth;
-        oldcoderate = codeRate;
-        
-        // select_params
-        float val = select_params(str.charAt(i), i);
-        if (i == 2)
-        {
-            Spreadf = (int)val;
-        }
-        else if (i==3)
-        {
-            Bandwidth = val;
-        }
-        else if (i==4)
-        {
-            codeRate = (int)val;
-        }
-        else if (i==5)
-        {
-            OutputPower = (int)val;
-        }
-
-        //for resending parameters
-        PrevReconfString = str;
-        scheduled=true;
-        
-    }
-    
 }
 
 void setup()
