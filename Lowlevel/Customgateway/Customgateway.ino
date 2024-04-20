@@ -222,12 +222,13 @@ float select_params(char c, int index) {
  */
 void set_params_lora(String str){
     // for loop for chars from 2 onward
+    oldSpreadf = Spreadf;
+    oldOutputPower = OutputPower;
+    oldBandwidth = Bandwidth;
+    oldcoderate = codeRate;
     for (int i = 2; i < str.length(); i++) {
         // store old values
-        oldSpreadf = Spreadf;
-        oldOutputPower = OutputPower;
-        oldBandwidth = Bandwidth;
-        oldcoderate = codeRate;
+        
         
         // select_params
         float val = select_params(str.charAt(i), i);
@@ -549,7 +550,7 @@ void loop(){
         // read received data as an Arduino String
         
         int receptionstate = radio.readData(str);
-    
+        
         if (receptionstate == RADIOLIB_ERR_NONE){
             // if first 2 chars in str String is ##, call dummy() function
             

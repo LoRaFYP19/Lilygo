@@ -231,7 +231,14 @@ float select_params(char c, int index) {
  * @throws ErrorType if there is an error in setting the parameters
  */
 void set_params_lora(String str){
+    // store old values
+    oldSpreadf = Spreadf;
+    oldOutputPower = OutputPower;
+    oldBandwidth = Bandwidth;
+    oldcoderate = codeRate;
+        
     // for loop for chars from 2 onward
+    
     for (int i = 2; i < str.length(); i++) {
         // store old values
         oldSpreadf = Spreadf;
@@ -371,6 +378,7 @@ void loop(){
             // if retransmission is done, setup the lora again to original parameters
             if (retxSch == true) { 
                 retxSch = false;
+                // Revert to original values
                 setup_lora();
             }
 
