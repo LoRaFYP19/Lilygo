@@ -105,7 +105,7 @@ void wifiReconnect() {
     delay(5000);
   }
 
-  Serial.println("Connected to wifi");
+//  Serial.println("Connected to wifi");
 }
 
 

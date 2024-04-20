@@ -342,7 +342,8 @@ void loop(){
 
     }
 
-    if ((scheduled_health == true) && (currentMillis - previousMillis >= interval_health) && isTransmitting == false) { // if scheduled and time is reached and no current transmissions
+    if ((scheduled_health == true) && (currentMillis - previousMillis_health >= interval_health) && isTransmitting == false) { // if scheduled and time is reached and no current transmissions
+        Serial.println("Health Check Transmit back");
         startHealthTransmission();
         scheduled_health = false;
     }
