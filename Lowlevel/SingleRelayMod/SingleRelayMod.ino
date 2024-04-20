@@ -21,7 +21,7 @@ unsigned long timeout=60000;
 #define PreAmbleLength 6
 #define wanSync 0x34
 
-
+#define nodeID 10
 
 int Spreadf= 8;
 int OutputPower = 2;
@@ -209,13 +209,15 @@ float select_params(char c, int index) {
  * @throws ErrorType if there is an error in setting the parameters
  */
 void set_params_lora(String str){
-    // for loop for chars from 2 onward
-    for (int i = 2; i < str.length(); i++) {
-        // store old values
+    // store old values
         oldSpreadf = Spreadf;
         oldOutputPower = OutputPower;
         oldBandwidth = Bandwidth;
         oldcoderate = codeRate;
+        
+    // for loop for chars from 2 onward
+    for (int i = 2; i < str.length(); i++) {
+        
         
         // select_params
         float val = select_params(str.charAt(i), i);
