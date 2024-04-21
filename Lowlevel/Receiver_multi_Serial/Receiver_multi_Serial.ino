@@ -17,7 +17,7 @@ SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUS
 #define wanSync 0x34
 
 // flag to indicate my node id
-#define mynodeId 0
+#define mynodeId 6
 
 volatile bool receivedFlag = false;
 
