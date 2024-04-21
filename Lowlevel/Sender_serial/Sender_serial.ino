@@ -8,8 +8,8 @@ SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUS
 #define LoRa_frequency 923.0
 #define nodeID 0
 #define wanSync 0x34
-#define sf 12
-#define tx_pow 17
+#define sf 8
+#define tx_pow 2
 #define bw 125
 
 // save transmission state between loops
@@ -125,7 +125,7 @@ void sendPacket()
     }
 
         else if(txNumber <= maxNumOfPackets + 10){
-      
+
         snprintf(txpacket, sizeof(txpacket), "%d,Tx Done", nodeID);
         Serial.println(txpacket);
         startTime = millis();
