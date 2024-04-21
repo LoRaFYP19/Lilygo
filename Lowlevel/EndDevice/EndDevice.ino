@@ -19,7 +19,7 @@ int codeRate = 5;
 
 int oldSpreadf = Spreadf;
 int oldOutputPower = OutputPower;
-int oldBandwidth = Bandwidth;
+float oldBandwidth = Bandwidth;
 int oldcoderate = codeRate;
 
 
@@ -28,7 +28,7 @@ unsigned long interval;
 bool scheduled = false;
 String PrevReconfString;
 bool retxSch=false;
-
+unsigned long timeout_reconf = 60000;
 
 
 unsigned long previousMillis_health = 0;
@@ -159,6 +159,7 @@ void setup_old_lora(){
         radio.setOutputPower(oldOutputPower);
         radio.setBandwidth(oldBandwidth);
         radio.setCodingRate(oldcoderate);
+        Serial.println("Old parameters set "+String(oldSpreadf)+" "+String(oldOutputPower)+" "+String(oldBandwidth)+" "+String(oldcoderate));
 }
 
 /**
@@ -240,11 +241,6 @@ void set_params_lora(String str){
     // for loop for chars from 2 onward
     
     for (int i = 2; i < str.length(); i++) {
-        // store old values
-        oldSpreadf = Spreadf;
-        oldOutputPower = OutputPower;
-        oldBandwidth = Bandwidth;
-        oldcoderate = codeRate;
         
         // select_params
         float val = select_params(str.charAt(i), i);
@@ -267,7 +263,6 @@ void set_params_lora(String str){
 
         //for resending parameters
         PrevReconfString = str;
-        scheduled=true;
         
     }
     
@@ -435,8 +430,12 @@ void loop(){
             if (str[0] == '#' && str[1] == '#'){ // for reconfiguration mode
                 set_params_lora(str);
                 setup_lora();
-                generateRandomInterval();
-                previousMillis = millis(); // this will start countdown for the scheduled re-transmission
+                if (currentMillis-previousMillis >= timeout_reconf){
+                    generateRandomInterval();
+                    scheduled=true;
+                    previousMillis = millis(); // this will start countdown for the scheduled re-transmission
+                }
+                
 
                 #ifdef HAS_DISPLAY
                 if (u8g2) {
