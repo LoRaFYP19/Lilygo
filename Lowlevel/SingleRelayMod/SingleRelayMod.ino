@@ -17,12 +17,6 @@ SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUS
 unsigned long previousMillis = 0;
 unsigned long timeout=60000;
 
-#define repeatSF 8
-#define PreAmbleLength 6
-#define wanSync 0x34
-
-#define nodeID 10
-
 int Spreadf= 8;
 int OutputPower = 2;
 float Bandwidth = 125;
@@ -30,16 +24,15 @@ int codeRate = 5;
 
 int oldSpreadf = Spreadf;
 int oldOutputPower = OutputPower;
-int oldBandwidth = Bandwidth;
+float oldBandwidth = Bandwidth;
 int oldcoderate = codeRate;
-
 
 unsigned long previousMillis = 0;
 unsigned long interval;
 bool scheduled = false;
 String PrevReconfString;
 bool retxSch=false;
-
+unsigned long timeout_reconf = 60000;
 
 
 unsigned long previousMillis_health = 0;
@@ -47,6 +40,10 @@ unsigned long interval_health;
 unsigned long timeout_health=60000;
 bool scheduled_health = false;
 
+
+// #define repeatSF 8
+#define PreAmbleLength 6
+#define wanSync 0x34
 
 // Queue buffer
 #define MAX_PACKETS 5
@@ -69,6 +66,14 @@ volatile bool enableInterrupt = true; // Flag to enable interrupt
 // save transmission state between loops
 int transmissionState = RADIOLIB_ERR_NONE;
 
+// Interrupt handler for both transmit and receive
+void handleInterrupt() {
+    if (!enableInterrupt) {
+        return;
+    }
+
+    actionFlag = true;
+}
 
 /**
  * Function to generate a random interval between two hardcoded values.
@@ -89,6 +94,29 @@ void generateRandomInterval_health() {
   
 }
 
+
+void startTransmission() {
+    // Check if the packet already exists in the buffer
+    for (int i = 0; i < MAX_PACKETS; i++) {
+        if (packetBuffer[i] == str) {
+            // Skip transmission
+            Serial.println("Duplicate packet, skipping transmission");
+            return;
+        }
+    }
+
+    Serial.print(F("Sending back ... "));
+    isTransmitting = true;
+    // add the str to the cache
+    // radio.setSpreadingFactor(repeatSF);
+    //transmissionState = radio.startTransmit("Hello World!"); // this is non-blocking action, meaning the radio is transmitting, the execution of other tasks are not on hold
+    transmissionState = radio.startTransmit(str); // this is non-blocking action, meaning the radio is transmitting, the execution of other tasks are not on hold
+    packetBuffer[head] = str;
+    head = (head + 1) % MAX_PACKETS;
+    previousMillis = millis();
+}
+
+
 /**
  * Transmits the previous configuration parameters incase some nodes missed the transmission.
  * @param None
@@ -106,7 +134,6 @@ void startReconfigTransmission() {
 }
 
 
-
 void startHealthTransmission() {
     Serial.print(F("Sending Health Ping ... "));
     isTransmitting = true;
@@ -116,8 +143,6 @@ void startHealthTransmission() {
     sprintf(txpacket, "%s", myString.c_str());
     transmissionState = radio.startTransmit(txpacket); // this is non-blocking action, meaning the radio is transmitting, the execution of other tasks are not on hold
 }
-
-
 
 /**
  * Sets up the LoRa module with the old configuration parameters.
@@ -132,8 +157,8 @@ void setup_old_lora(){
         radio.setOutputPower(oldOutputPower);
         radio.setBandwidth(oldBandwidth);
         radio.setCodingRate(oldcoderate);
+        Serial.println("Old parameters set "+String(oldSpreadf)+" "+String(oldOutputPower)+" "+String(oldBandwidth)+" "+String(oldcoderate));
 }
-
 
 /**
  * Sets up the LoRa radio module with the specified parameters. Will call after reconfiguring the parameters
@@ -150,8 +175,6 @@ void setup_lora(){
         radio.setBandwidth(Bandwidth);
         radio.setCodingRate(codeRate);
 }
-
-
 
 
 
@@ -199,6 +222,7 @@ float select_params(char c, int index) {
 
 }
 
+
 /**
  * Set LoRa parameters based on the input string.
  *
@@ -210,14 +234,14 @@ float select_params(char c, int index) {
  */
 void set_params_lora(String str){
     // store old values
-        oldSpreadf = Spreadf;
-        oldOutputPower = OutputPower;
-        oldBandwidth = Bandwidth;
-        oldcoderate = codeRate;
+    oldSpreadf = Spreadf;
+    oldOutputPower = OutputPower;
+    oldBandwidth = Bandwidth;
+    oldcoderate = codeRate;
         
     // for loop for chars from 2 onward
+    
     for (int i = 2; i < str.length(); i++) {
-        
         
         // select_params
         float val = select_params(str.charAt(i), i);
@@ -239,8 +263,7 @@ void set_params_lora(String str){
         }
 
         //for resending parameters
-        // PrevReconfString = str;
-        // scheduled=true;
+        PrevReconfString = str;
         
     }
     
@@ -248,40 +271,16 @@ void set_params_lora(String str){
 
 
 
-// Interrupt handler for both transmit and receive
-void handleInterrupt() {
-    if (!enableInterrupt) {
-        return;
-    }
-
-    actionFlag = true;
-}
-
-void startTransmission() {
-    // Check if the packet already exists in the buffer
-    for (int i = 0; i < MAX_PACKETS; i++) {
-        if (packetBuffer[i] == str) {
-            // Skip transmission
-            Serial.println("Duplicate packet, skipping transmission");
-            return;
-        }
-    }
-
-    Serial.print(F("Sending back ... "));
-    isTransmitting = true;
-    // add the str to the cache
-    radio.setSpreadingFactor(repeatSF);
-    transmissionState = radio.startTransmit(str); // this is non-blocking action, meaning the radio is transmitting, the execution of other tasks are not on hold
-    packetBuffer[head] = str;
-    head = (head + 1) % MAX_PACKETS;
-    previousMillis = millis();
-}
-
 void setup()
 {
     initBoard();
     // When the power is turned on, a delay is required.
     delay(1500);
+
+    randomSeed(analogRead(0));  // Seed the random number generator
+    generateRandomInterval();
+    generateRandomInterval_health();
+
 
     // initialize SX1276 with default settings
     Serial.print(F("Initializing ... "));
@@ -293,8 +292,8 @@ void setup()
     if (state == RADIOLIB_ERR_NONE) {
         Serial.println(F("success!"));
         radio.setSpreadingFactor(Spreadf);
-        radio.setOutputPower(OutputPower);
-        radio.setBandwidth(Bandwidth);
+        radio.setOutputPower(2);
+        radio.setBandwidth(125);
         radio.setCurrentLimit(120);
         radio.setSyncWord(wanSync);
         radio.setPreambleLength(PreAmbleLength);
@@ -330,8 +329,22 @@ void setup()
 }
 
 void loop(){
-
+    
     unsigned long currentMillis = millis();
+
+    if ((scheduled == true) && (currentMillis - previousMillis >= interval) && isTransmitting == false) { // if scheduled and time is reached, and not transmitting
+        setup_old_lora();
+        startReconfigTransmission();
+        scheduled = false;
+        retxSch = true;
+
+    }
+
+    else if ((scheduled_health == true) && (currentMillis - previousMillis_health >= interval_health) && isTransmitting == false) { // if scheduled and time is reached and no current transmissions
+        Serial.println("Health Check Transmit back");
+        startHealthTransmission();
+        scheduled_health = false;
+    }
 
     // check if the flag is triggerd
     if (actionFlag){
@@ -353,6 +366,13 @@ void loop(){
             // clean up after transmission is finished
             // this will ensure transmitter is disabled,
             // RF switch is powered down etc.
+            // if retransmission is done, setup the lora again to original parameters
+            if (retxSch == true) { 
+                retxSch = false;
+                // Revert to original values
+                setup_lora();
+            }
+
             radio.finishTransmit();
             delay(100);
             radio.setSpreadingFactor(Spreadf);
@@ -371,29 +391,6 @@ void loop(){
 
             // put module back to listen mode
             radio.startReceive();
-
-
-            if (str[0] == '#' && str[1] == '#'){ // for reconfiguration mode
-                set_params_lora(str);
-                setup_lora();
-                // generateRandomInterval();
-                previousMillis = millis(); // this will start countdown for the scheduled re-transmission
-
-                #ifdef HAS_DISPLAY
-                if (u8g2) {
-                    char buf[256];
-                    u8g2->clearBuffer();
-                    u8g2->drawStr(0, 12, "Reconfigure recived!");
-                    u8g2->drawStr(5, 26, str.c_str());
-                    snprintf(buf, sizeof(buf), "RSSI:%.2f", radio.getRSSI());
-                    u8g2->drawStr(0, 40, buf);
-                    snprintf(buf, sizeof(buf), "SNR:%.2f", radio.getSNR());
-                    u8g2->drawStr(0, 54, buf);
-                    u8g2->sendBuffer();
-                }
-                 #endif
-
-
     }
     else{
         // Triggered by reception
@@ -423,8 +420,58 @@ void loop(){
                     u8g2->sendBuffer();
                 }
             #endif
-            delay(100);
+            // delay(10);
             startTransmission();
+
+            if (str[0] == '#' && str[1] == '#'){ // for reconfiguration mode
+                set_params_lora(str);
+                setup_lora();
+                if (currentMillis-previousMillis >= timeout_reconf){
+                    generateRandomInterval();
+                    scheduled=true;
+                    previousMillis = millis(); // this will start countdown for the scheduled re-transmission
+                }
+                
+
+                #ifdef HAS_DISPLAY
+                if (u8g2) {
+                    char buf[256];
+                    u8g2->clearBuffer();
+                    u8g2->drawStr(0, 12, "Reconfigure recived!");
+                    u8g2->drawStr(5, 26, str.c_str());
+                    snprintf(buf, sizeof(buf), "RSSI:%.2f", radio.getRSSI());
+                    u8g2->drawStr(0, 40, buf);
+                    snprintf(buf, sizeof(buf), "SNR:%.2f", radio.getSNR());
+                    u8g2->drawStr(0, 54, buf);
+                    u8g2->sendBuffer();
+                }
+                 #endif
+
+                // delay(1);
+            }
+            else if(str[0] == '%' && str[1] == '%'){ // for healthcheck.
+                
+                if(currentMillis - previousMillis_health >= timeout_health){
+                generateRandomInterval_health();
+                previousMillis_health = millis();
+                scheduled_health=true;
+                }
+
+                #ifdef HAS_DISPLAY
+
+                if (u8g2) {
+                    char buf[256];
+                    u8g2->clearBuffer();
+                    u8g2->drawStr(0, 12, "Health Ping recived!");
+                    u8g2->drawStr(5, 26, str.c_str());
+                    snprintf(buf, sizeof(buf), "RSSI:%.2f", radio.getRSSI());
+                    u8g2->drawStr(0, 40, buf);
+                    snprintf(buf, sizeof(buf), "SNR:%.2f", radio.getSNR());
+                    u8g2->sendBuffer();
+                }
+                 #endif
+            }
+
         
         }
         else if (receptionstate == RADIOLIB_ERR_CRC_MISMATCH){
@@ -438,16 +485,15 @@ void loop(){
             Serial.println(receptionstate);
         }
 
-      }
-
     }
-   }
-    enableInterrupt = true;
-     if (currentMillis- previousMillis >= timeout) {
+
+}
+ enableInterrupt = true;
+ if (currentMillis- previousMillis >= timeout) {
 
         for (int i=0; i<MAX_PACKETS; i++) {
             packetBuffer[i] = "";
         }
 
     }
-}
+    }
