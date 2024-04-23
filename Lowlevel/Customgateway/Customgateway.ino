@@ -25,7 +25,7 @@ int oldBandwidth = Bandwidth;
 int oldcoderate = codeRate;
 
 //wifi login data
-const char* ssid     = "F1";
+const char* ssid     = "V1";
 const char* password = "123456789";
 
 //MQTT
@@ -122,8 +122,8 @@ void connectToMQTT() {
     Serial.println("Connecting to MQTT broker...");
     if (client.connect(clientId, mqttUser, mqttPassword)) {
       Serial.println("Connected to MQTT broker");
-      client.subscribe("CGateway/reconfig");
-      client.subscribe("CGateway/health");
+      client.subscribe("CGateway/reconfignew");
+      client.subscribe("CGateway/healthnew");
       delay(100);
     //   LCD.clear();
     }
@@ -150,8 +150,8 @@ void mqttReconnect() {
     if (client.connect(clientId)) {
       Serial.print(clientId);
       Serial.println(" connected");
-      client.subscribe("CGateway/reconfig");
-      client.subscribe("CGateway/health");
+      client.subscribe("CGateway/reconfignew");
+      client.subscribe("CGateway/healthnew");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -271,7 +271,7 @@ void mqttCallback(char* topic, byte* message, unsigned int length) {
   }
 
   // update alarm data
-  if (String(topic) == "CGateway/reconfig") {
+  if (String(topic) == "CGateway/reconfignew") {
     Serial.print("Recived Data MQTT..");
     set_params_lora(payload);
     setup_lora();
@@ -281,7 +281,7 @@ void mqttCallback(char* topic, byte* message, unsigned int length) {
     sleep(2);
     // LCD.clear();
   }
-  if (String(topic) == "CGateway/health") {
+  if (String(topic) == "CGateway/healthnew") {
     Serial.print("Recived Data MQTT..");
     generateRandomInterval_health();
     previousMillis_health = millis();
@@ -600,6 +600,6 @@ void loop(){
 
   if (!client.connected()) {
     mqttReconnect();
-  }
+    }
 
 }
