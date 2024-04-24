@@ -1,0 +1,1426 @@
+[
+    {
+        "id": "efa22fa5838a76d1",
+        "type": "tab",
+        "label": "Flow 21",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "790fcd5f75608a71",
+        "type": "group",
+        "z": "efa22fa5838a76d1",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "79d402ed1fdfef65",
+            "d4368d0f33e3ee82",
+            "62432844500562ac",
+            "b0420117e79ff096",
+            "4279309038b17c79"
+        ],
+        "x": 84,
+        "y": 899,
+        "w": 342,
+        "h": 282
+    },
+    {
+        "id": "3582c2e7b91a443d",
+        "type": "group",
+        "z": "efa22fa5838a76d1",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "1b71e56f66176b38",
+            "55d106b8c6777825",
+            "413e53deaf5fd46a",
+            "cfca176ced25e20b",
+            "6f5894d70dd5ad1c",
+            "64376df35e49b3db",
+            "3ea7fba3375ce3a5",
+            "8a7ffb1fe394a7e2",
+            "a6ca7cea8d4847ba",
+            "9e067896257bfc4a",
+            "038bb5dc1a8054cb",
+            "fe5f0cddbeb3b927",
+            "cca3764e7ae8fa10",
+            "2d1cea8691e92132"
+        ],
+        "x": 494,
+        "y": 879,
+        "w": 1112,
+        "h": 322
+    },
+    {
+        "id": "88ad58dbc9985e9b",
+        "type": "group",
+        "z": "efa22fa5838a76d1",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "0e1797d566523146",
+            "0b0a4bc1da96952b"
+        ],
+        "x": 634,
+        "y": 639,
+        "w": 612,
+        "h": 102
+    },
+    {
+        "id": "9e30788cc38a470c",
+        "type": "group",
+        "z": "efa22fa5838a76d1",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "16559ab0ab69ee29",
+            "3c79832b52066fa9",
+            "15865b6859d01253",
+            "17ed8b924bd7e899",
+            "8007ebf936717b5f",
+            "37dc6a4fc5f6c74a",
+            "cae3ea70d1172083",
+            "5e3df45deae8de59",
+            "dd32568ac5080854",
+            "bcd88338ded1c53d",
+            "3a69cca86b9c43df",
+            "e793395b9d611d4b",
+            "33c4f7a3396696b8",
+            "30b9af79307e2f6d",
+            "6c1374427e31f62b",
+            "c5acab6898462bba",
+            "8b50b56565a55c02",
+            "cd75c632543c80c9",
+            "f7043773b4470435",
+            "fa833e0c1c9e0de0",
+            "dd010534a0f19e1b",
+            "ff6a2af4012bb8e7",
+            "87228df5719d909e"
+        ],
+        "x": 54,
+        "y": 19,
+        "w": 1552,
+        "h": 582
+    },
+    {
+        "id": "16559ab0ab69ee29",
+        "type": "mqtt in",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "",
+        "topic": "CGateway/logdata",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "315fb779a9a821b6",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 170,
+        "y": 220,
+        "wires": [
+            [
+                "3c79832b52066fa9",
+                "15865b6859d01253"
+            ]
+        ]
+    },
+    {
+        "id": "3c79832b52066fa9",
+        "type": "debug",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 410,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "15865b6859d01253",
+        "type": "switch",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "type check",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "cont",
+                "v": "%%",
+                "vt": "str"
+            },
+            {
+                "t": "cont",
+                "v": "##",
+                "vt": "str"
+            },
+            {
+                "t": "cont",
+                "v": ",",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 3,
+        "x": 430,
+        "y": 220,
+        "wires": [
+            [
+                "8007ebf936717b5f"
+            ],
+            [
+                "37dc6a4fc5f6c74a"
+            ],
+            [
+                "e793395b9d611d4b"
+            ]
+        ]
+    },
+    {
+        "id": "0e1797d566523146",
+        "type": "mqtt out",
+        "z": "efa22fa5838a76d1",
+        "g": "88ad58dbc9985e9b",
+        "name": "",
+        "topic": "CGateway/healthnew",
+        "qos": "0",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "315fb779a9a821b6",
+        "x": 1120,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "17ed8b924bd7e899",
+        "type": "function",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "",
+        "func": "// Function node code\nvar messageType = msg.type;\nvar packetNumber = msg.number;\nvar rssiValue = msg.rssi;\nvar signalToNoiseRatio = msg.snr;\nvar frequencyError = msg.ferror;\nvar id = msg.id;\nconst d = new Date();\ntime = d.toLocaleString();\n\n\n// Create an array with the message parameters\nvar dataArray = [];\n\n// Push data into the array\ndataArray.push({\n    time:time,\n    type: messageType,\n    number: packetNumber,\n    rssi: rssiValue,\n    snr: signalToNoiseRatio,\n    ferror: frequencyError,\n    nodeId:id\n});\n\nvar data_cmd = {\n    command:\"addRow\",\n    arguments:dataArray\n}\n\n// Assign the array to msg.payload\nmsg.payload = data_cmd;\n\n// Return the modified message\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 160,
+        "wires": [
+            [
+                "5e3df45deae8de59"
+            ]
+        ]
+    },
+    {
+        "id": "8007ebf936717b5f",
+        "type": "function",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "",
+        "func": "// Extracting values from the incoming message\nvar data = msg.payload.trim().replace(/^%%/, ''); // Remove '%%' from the beginning and trim any whitespace\nvar values = data.split(','); // Split the string by commas\n\n// Assigning values to message properties\nmsg.type = \"Health\";\nmsg.id = parseInt(values[0]); // 1st is the id\nmsg.number = parseInt(values[1]); // Second is the number\nmsg.rssi = parseInt(values[2]); // 3rd is the rssi\nmsg.snr = parseInt(values[3]); // 4th is the snr\nmsg.ferror = parseInt(values[4]); // Last one is the ferror\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 160,
+        "wires": [
+            [
+                "17ed8b924bd7e899",
+                "dd010534a0f19e1b",
+                "ff6a2af4012bb8e7"
+            ]
+        ]
+    },
+    {
+        "id": "37dc6a4fc5f6c74a",
+        "type": "function",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "",
+        "func": "// Extracting values from the incoming message\nvar data = msg.payload.trim().replace(/^##/, ''); // Remove '%%' from the beginning and trim any whitespace\nvar values = data.split(','); // Split the string by commas\n\n// Assigning values to message properties\nmsg.type = \"Reconfig\";\nmsg.id = parseInt(values[0]); // 1st is the id\nmsg.number = parseInt(values[1]); // Second is the number\nmsg.rssi = parseInt(values[2]); // 3rd is the rssi\nmsg.snr = parseInt(values[3]); // 4th is the snr\nmsg.ferror = parseInt(values[4]); // Last one is the ferror\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 280,
+        "wires": [
+            [
+                "cae3ea70d1172083",
+                "cd75c632543c80c9"
+            ]
+        ]
+    },
+    {
+        "id": "cae3ea70d1172083",
+        "type": "function",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "",
+        "func": "// Function node code\nvar messageType = msg.type;\nvar packetNumber = msg.number;\nvar rssiValue = msg.rssi;\nvar signalToNoiseRatio = msg.snr;\nvar frequencyError = msg.ferror;\nvar id = msg.id;\nconst d = new Date();\ntime = d.toLocaleString();\n\n\n// Create an array with the message parameters\nvar dataArray = [];\n\n// Push data into the array\ndataArray.push({\n    time:time,\n    type: messageType,\n    number: packetNumber,\n    rssi: rssiValue,\n    snr: signalToNoiseRatio,\n    ferror: frequencyError,\n    nodeId:id\n});\n\nvar data_cmd = {\n    command:\"addRow\",\n    arguments:dataArray\n}\n\n// Assign the array to msg.payload\nmsg.payload = data_cmd;\n\n// Return the modified message\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 280,
+        "wires": [
+            [
+                "5e3df45deae8de59"
+            ]
+        ]
+    },
+    {
+        "id": "5e3df45deae8de59",
+        "type": "ui_table",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "group": "7e662697b834e974",
+        "name": "",
+        "order": 1,
+        "width": "20",
+        "height": "6",
+        "columns": [
+            {
+                "field": "time",
+                "title": "Time",
+                "width": "20%",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "number",
+                "title": "Packet number",
+                "width": "14%",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "type",
+                "title": "Message Type",
+                "width": "15%",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "nodeId",
+                "title": "Payload",
+                "width": "12%",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "rssi",
+                "title": "RSSI value",
+                "width": "10%",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "snr",
+                "title": "SNR value",
+                "width": "10%",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "ferror",
+                "title": "frequancy error",
+                "width": "20%",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            }
+        ],
+        "outputs": 1,
+        "cts": true,
+        "x": 1050,
+        "y": 200,
+        "wires": [
+            [
+                "bcd88338ded1c53d",
+                "6c1374427e31f62b"
+            ]
+        ]
+    },
+    {
+        "id": "dd32568ac5080854",
+        "type": "ui_button",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "",
+        "group": "7e662697b834e974",
+        "order": 1,
+        "width": "6",
+        "height": "1",
+        "passthru": false,
+        "label": "Clear Log",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "[]",
+        "payloadType": "json",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 700,
+        "y": 220,
+        "wires": [
+            [
+                "5e3df45deae8de59"
+            ]
+        ]
+    },
+    {
+        "id": "bcd88338ded1c53d",
+        "type": "function",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "",
+        "func": "// Preprocessing function\nvar processedData = {};\n\nif (msg.payload.type === 'Health') {\n    processedData = {\n        type: 'Health',\n        number: msg.payload.number,\n        rssi: msg.payload.rssi,\n        snr: msg.payload.snr,\n        ferror: msg.payload.ferror,\n        nodeId: msg.payload.nodeId\n    };\n    \n} else if (msg.payload.type === 'Reconfig') {\n    // Extracting parts of nodeId\n    var nodeId = msg.payload.nodeId.toString();\n    var SF = nodeId.charAt(0);\n    var BW = nodeId.charAt(1);\n    var CR = nodeId.charAt(2);\n    var TX = nodeId.charAt(3);\n\n    // Mapping values\n    var sfMapping = {1: 'SF 7', 2: 'SF 8', 3: 'SF 9', 4: 'SF 10', 5: 'SF 11', 6: 'SF 12'};\n    var bwMapping = {1: '10.4kHz', 2: '15.6kHz', 3: '20.8kHz', 4: '31.25kHz', 5: '41.7kHz', 6: '62.5kHz', 7: '125kHz', 8: '250kHz', 9: '500kHz'};\n    var crMapping = {5: '4/5', 6: '4/6', 7: '4/7', 8: '4/8'};\n    var txMapping = {0: '2dBm', 1: '3dBm', 2: '4dBm', 3: '5dBm', 4: '6dBm', 5: '7dBm', 6: '8dBm', 7: '9dBm', 8: '10dBm', 9: '11dBm', a: '12dBm', b: '13dBm', c: '14dBm', d: '15dBm', e: '16dBm', f: '17dBm'};\n\n    processedData = {\n        type: 'Reconfig',\n        number: msg.payload.number,\n        rssi: msg.payload.rssi,\n        snr: msg.payload.snr, // Assuming SNR needs to be multiplied by 10\n        ferror: msg.payload.ferror,\n        nodeId: {\n            SF: sfMapping[SF],\n            BW: bwMapping[BW],\n            CR: crMapping[CR],\n            TX: txMapping[TX]\n        }\n    };\n}\nelse if(msg.payload.type === 'Warning'){\n    \n    var payldData = msg.payload.nodeId.toString().split(',');\n    var date = payldData[1];\n    \n    var millisecondsSince12AM =date //parseInt(date, 16);\n    var hours = Math.floor(millisecondsSince12AM / (1000 * 60 * 60));\n    var remainingMilliseconds = millisecondsSince12AM % (1000 * 60 * 60);\n    var minutes = Math.floor(remainingMilliseconds / (1000 * 60));\n    remainingMilliseconds %= (1000 * 60);\n    var seconds = Math.floor(remainingMilliseconds / 1000);\n    var milliseconds = remainingMilliseconds % 1000;\n    var timm = hours+\":\"+minutes+\":\"+seconds+\":\"+milliseconds;\n    \n    processedData = {\n        type: 'Warning Message',\n        number: msg.payload.number,\n        rssi: msg.payload.rssi,\n        snr: msg.payload.snr,\n        ferror: msg.payload.ferror,\n        nodeId: payldData[0],\n        timeofoccure:timm\n    };\n}\n\n// Output the processed data\nmsg.processedData = processedData;\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1240,
+        "y": 280,
+        "wires": [
+            [
+                "3a69cca86b9c43df",
+                "c5acab6898462bba",
+                "8b50b56565a55c02"
+            ]
+        ]
+    },
+    {
+        "id": "3a69cca86b9c43df",
+        "type": "ui_template",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "group": "d7ec2c96679f49aa",
+        "name": "",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "format": "<div>\n    <p>Type: {{msg.processedData.type}}</p>\n    <p>Packet Number: {{msg.processedData.number}}</p>\n    <p>RSSI: {{msg.processedData.rssi}}</p>\n    <p>SNR: {{msg.processedData.snr}}</p>\n    <p>Frequency Error: {{msg.processedData.ferror}}</p>\n    <p ng-if=\"msg.processedData.type === 'Health'\">Node Number: {{msg.processedData.nodeId}}</p>\n    <p ng-if=\"msg.processedData.type === 'Reconfig'\">Node Details:</p>\n    <p ng-if=\"msg.processedData.type === 'Reconfig'\">Spreading Factor: {{msg.processedData.nodeId.SF}}</p>\n    <p ng-if=\"msg.processedData.type === 'Reconfig'\">Bandwidth: {{msg.processedData.nodeId.BW}}</p>\n    <p ng-if=\"msg.processedData.type === 'Reconfig'\">Code Rating: {{msg.processedData.nodeId.CR}}</p>\n    <p ng-if=\"msg.processedData.type === 'Reconfig'\">TX Power: {{msg.processedData.nodeId.TX}}</p>\n    \n    <p ng-if=\"msg.processedData.type === 'Warning Message'\">Node Details:</p>\n    <p ng-if=\"msg.processedData.type === 'Warning Message'\">Occured Node Id: {{msg.processedData.nodeId}}</p>\n    <p ng-if=\"msg.processedData.type === 'Warning Message'\">Time Stamp: {{msg.processedData.timeofoccure}}</p>\n    \n    \n    \n</div>\n",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1420,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e793395b9d611d4b",
+        "type": "function",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "",
+        "func": "// Extracting values from the incoming message\nvar data = msg.payload.trim();//.replace(/^##/, ''); // Remove '%%' from the beginning and trim any whitespace\nvar values = data.split(','); // Split the string by commas\n\n// Assigning values to message properties\nmsg.type = \"Warning\";\nmsg.id = parseInt(values[0]); // 1st is the id\nmsg.timest = parseInt(values[1],16);\nmsg.number = parseInt(values[2]); // Second is the number\nmsg.rssi = parseInt(values[3]); // 3rd is the rssi\nmsg.snr = parseInt(values[4]); // 4th is the snr\nmsg.ferror = parseInt(values[5]); // Last one is the ferror\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 340,
+        "wires": [
+            [
+                "33c4f7a3396696b8"
+            ]
+        ]
+    },
+    {
+        "id": "33c4f7a3396696b8",
+        "type": "function",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "",
+        "func": "// Function node code\nvar messageType = msg.type;\nvar packetNumber = msg.number;\nvar rssiValue = msg.rssi;\nvar signalToNoiseRatio = msg.snr;\nvar frequencyError = msg.ferror;\nvar id = msg.id;\nid = id +\",\"+msg.timest;\nconst d = new Date();\ntime = d.toLocaleString();\n\n\n// Create an array with the message parameters\nvar dataArray = [];\n\n// Push data into the array\ndataArray.push({\n    time:time,\n    type: messageType,\n    number: packetNumber,\n    rssi: rssiValue,\n    snr: signalToNoiseRatio,\n    ferror: frequencyError,\n    nodeId:id\n});\n\nvar data_cmd = {\n    command:\"addRow\",\n    arguments:dataArray\n}\n\n// Assign the array to msg.payload\nmsg.payload = data_cmd;\n\n// Return the modified message\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 340,
+        "wires": [
+            [
+                "5e3df45deae8de59",
+                "30b9af79307e2f6d"
+            ]
+        ]
+    },
+    {
+        "id": "30b9af79307e2f6d",
+        "type": "debug",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1010,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "6c1374427e31f62b",
+        "type": "debug",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1250,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "c5acab6898462bba",
+        "type": "debug",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1510,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "79d402ed1fdfef65",
+        "type": "ui_text",
+        "z": "efa22fa5838a76d1",
+        "g": "790fcd5f75608a71",
+        "group": "6f86ca3fe2bcc1f6",
+        "order": 0,
+        "width": "6",
+        "height": "1",
+        "name": "",
+        "label": "SF",
+        "format": "{{msg.processedData.nodeId.SF}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 250,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "8b50b56565a55c02",
+        "type": "switch",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "",
+        "property": "payload.type",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "Reconfig",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 1310,
+        "y": 380,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d4368d0f33e3ee82",
+        "type": "link in",
+        "z": "efa22fa5838a76d1",
+        "g": "790fcd5f75608a71",
+        "name": "",
+        "links": [
+            "f7043773b4470435",
+            "2d1cea8691e92132"
+        ],
+        "x": 125,
+        "y": 940,
+        "wires": [
+            [
+                "79d402ed1fdfef65",
+                "62432844500562ac",
+                "b0420117e79ff096",
+                "4279309038b17c79"
+            ]
+        ]
+    },
+    {
+        "id": "62432844500562ac",
+        "type": "ui_text",
+        "z": "efa22fa5838a76d1",
+        "g": "790fcd5f75608a71",
+        "group": "6f86ca3fe2bcc1f6",
+        "order": 0,
+        "width": "6",
+        "height": "1",
+        "name": "",
+        "label": "BW",
+        "format": "{{msg.processedData.nodeId.BW}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 250,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "b0420117e79ff096",
+        "type": "ui_text",
+        "z": "efa22fa5838a76d1",
+        "g": "790fcd5f75608a71",
+        "group": "6f86ca3fe2bcc1f6",
+        "order": 0,
+        "width": "6",
+        "height": "1",
+        "name": "",
+        "label": "CR",
+        "format": "{{msg.processedData.nodeId.CR}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 270,
+        "y": 1100,
+        "wires": []
+    },
+    {
+        "id": "4279309038b17c79",
+        "type": "ui_text",
+        "z": "efa22fa5838a76d1",
+        "g": "790fcd5f75608a71",
+        "group": "6f86ca3fe2bcc1f6",
+        "order": 0,
+        "width": "6",
+        "height": "1",
+        "name": "",
+        "label": "Transmission Power",
+        "format": "{{msg.processedData.nodeId.TX}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 300,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "cd75c632543c80c9",
+        "type": "function",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "",
+        "func": "    var nodeId = msg.id.toString();\n    var SF = nodeId.charAt(0);\n    var BW = nodeId.charAt(1);\n    var CR = nodeId.charAt(2);\n    var TX = nodeId.charAt(3);\n\n    // Mapping values\n    var sfMapping = {1: 'SF 7', 2: 'SF 8', 3: 'SF 9', 4: 'SF 10', 5: 'SF 11', 6: 'SF 12'};\n    var bwMapping = {1: '10.4kHz', 2: '15.6kHz', 3: '20.8kHz', 4: '31.25kHz', 5: '41.7kHz', 6: '62.5kHz', 7: '125kHz', 8: '250kHz', 9: '500kHz'};\n    var crMapping = {5: '4/5', 6: '4/6', 7: '4/7', 8: '4/8'};\n    var txMapping = {0: '2dBm', 1: '3dBm', 2: '4dBm', 3: '5dBm', 4: '6dBm', 5: '7dBm', 6: '8dBm', 7: '9dBm', 8: '10dBm', 9: '11dBm', a: '12dBm', b: '13dBm', c: '14dBm', d: '15dBm', e: '16dBm', f: '17dBm'};\n\n    processedData = {\n        type: 'Reconfig',\n        number: msg.payload.number,\n        rssi: msg.payload.rssi,\n        snr: msg.payload.snr, // Assuming SNR needs to be multiplied by 10\n        ferror: msg.payload.ferror,\n        nodeId: {\n            SF: sfMapping[SF],\n            BW: bwMapping[BW],\n            CR: crMapping[CR],\n            TX: txMapping[TX]\n        }\n    };\n    msg.processedData = processedData; \nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 920,
+        "y": 440,
+        "wires": [
+            [
+                "f7043773b4470435",
+                "fa833e0c1c9e0de0"
+            ]
+        ]
+    },
+    {
+        "id": "f7043773b4470435",
+        "type": "link out",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "",
+        "mode": "link",
+        "links": [
+            "d4368d0f33e3ee82"
+        ],
+        "x": 1055,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "fa833e0c1c9e0de0",
+        "type": "debug",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1170,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "dd010534a0f19e1b",
+        "type": "function",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "",
+        "func": "// Get the node ID from the health ping message\nvar nodeId = msg.id;\n\n// Retrieve the existing list from the context (global or flow)\nvar nodeList = flow.get('nodeList') || [];\n\n// Check if the node ID is already in the list\nif (!nodeList.includes(nodeId)) {\n    // If the node ID is not in the list, add it\n    nodeList.push(nodeId);\n    // Update the context with the updated list\n    flow.set('nodeList', nodeList);\n} \nmsg.nodelistlen=nodeList.length\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 80,
+        "wires": [
+            [
+                "87228df5719d909e"
+            ]
+        ]
+    },
+    {
+        "id": "ff6a2af4012bb8e7",
+        "type": "debug",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "87228df5719d909e",
+        "type": "ui_text",
+        "z": "efa22fa5838a76d1",
+        "g": "9e30788cc38a470c",
+        "group": "6f86ca3fe2bcc1f6",
+        "order": 4,
+        "width": "6",
+        "height": "1",
+        "name": "",
+        "label": "Number Of Identified Healthy Nodes",
+        "format": "{{msg.nodelistlen}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 1070,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "0b0a4bc1da96952b",
+        "type": "ui_button",
+        "z": "efa22fa5838a76d1",
+        "g": "88ad58dbc9985e9b",
+        "name": "",
+        "group": "368addc339f6326f",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Initiate a Health Check",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "\"hc\"",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 760,
+        "y": 680,
+        "wires": [
+            [
+                "0e1797d566523146"
+            ]
+        ]
+    },
+    {
+        "id": "1b71e56f66176b38",
+        "type": "ui_dropdown",
+        "z": "efa22fa5838a76d1",
+        "g": "3582c2e7b91a443d",
+        "name": "",
+        "label": "BW",
+        "tooltip": "",
+        "place": "125KHz",
+        "group": "368addc339f6326f",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "multiple": false,
+        "options": [
+            {
+                "label": "10.4Khz",
+                "value": "1",
+                "type": "str"
+            },
+            {
+                "label": "15.6KHz ",
+                "value": "2",
+                "type": "str"
+            },
+            {
+                "label": "20.8KHz",
+                "value": "3",
+                "type": "str"
+            },
+            {
+                "label": "31.25KHz",
+                "value": "4",
+                "type": "str"
+            },
+            {
+                "label": "41.7KHz",
+                "value": "5",
+                "type": "str"
+            },
+            {
+                "label": "62.5KHz",
+                "value": "6",
+                "type": "str"
+            },
+            {
+                "label": "125KHz",
+                "value": "7",
+                "type": "str"
+            },
+            {
+                "label": "250Khz ",
+                "value": "8",
+                "type": "str"
+            },
+            {
+                "label": "500kHz",
+                "value": "9",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 570,
+        "y": 1060,
+        "wires": [
+            [
+                "cfca176ced25e20b"
+            ]
+        ]
+    },
+    {
+        "id": "55d106b8c6777825",
+        "type": "ui_dropdown",
+        "z": "efa22fa5838a76d1",
+        "g": "3582c2e7b91a443d",
+        "name": "",
+        "label": "CR",
+        "tooltip": "",
+        "place": "4/5",
+        "group": "368addc339f6326f",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "multiple": false,
+        "options": [
+            {
+                "label": "4/5",
+                "value": "5",
+                "type": "str"
+            },
+            {
+                "label": "4/6",
+                "value": "6",
+                "type": "str"
+            },
+            {
+                "label": "4/7",
+                "value": "7",
+                "type": "str"
+            },
+            {
+                "label": "4/8",
+                "value": "8",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 570,
+        "y": 1100,
+        "wires": [
+            [
+                "6f5894d70dd5ad1c"
+            ]
+        ]
+    },
+    {
+        "id": "413e53deaf5fd46a",
+        "type": "ui_dropdown",
+        "z": "efa22fa5838a76d1",
+        "g": "3582c2e7b91a443d",
+        "name": "",
+        "label": "TX power",
+        "tooltip": "",
+        "place": "2 dBm",
+        "group": "368addc339f6326f",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "multiple": false,
+        "options": [
+            {
+                "label": "2 dBm",
+                "value": "0",
+                "type": "str"
+            },
+            {
+                "label": "3 dBm",
+                "value": "1",
+                "type": "str"
+            },
+            {
+                "label": "4 dBm",
+                "value": "2",
+                "type": "str"
+            },
+            {
+                "label": "5 dBm",
+                "value": "3",
+                "type": "str"
+            },
+            {
+                "label": "6 dBm",
+                "value": "4",
+                "type": "str"
+            },
+            {
+                "label": "7 dBm",
+                "value": "5",
+                "type": "str"
+            },
+            {
+                "label": "8 dBm",
+                "value": "6",
+                "type": "str"
+            },
+            {
+                "label": "9 dBm",
+                "value": "7",
+                "type": "str"
+            },
+            {
+                "label": "10 dBm",
+                "value": "8",
+                "type": "str"
+            },
+            {
+                "label": "11 dBm",
+                "value": "9",
+                "type": "str"
+            },
+            {
+                "label": "12 dBm",
+                "value": "a",
+                "type": "str"
+            },
+            {
+                "label": "13 dBm",
+                "value": "b",
+                "type": "str"
+            },
+            {
+                "label": "14 dBm",
+                "value": "c",
+                "type": "str"
+            },
+            {
+                "label": "15 dBm",
+                "value": "d",
+                "type": "str"
+            },
+            {
+                "label": "16 dBm",
+                "value": "e",
+                "type": "str"
+            },
+            {
+                "label": "17 dBm",
+                "value": "f",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 580,
+        "y": 1140,
+        "wires": [
+            [
+                "64376df35e49b3db"
+            ]
+        ]
+    },
+    {
+        "id": "a6ca7cea8d4847ba",
+        "type": "ui_button",
+        "z": "efa22fa5838a76d1",
+        "g": "3582c2e7b91a443d",
+        "name": "",
+        "group": "368addc339f6326f",
+        "order": 5,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Send a Reconfig message",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 1020,
+        "y": 1080,
+        "wires": [
+            [
+                "038bb5dc1a8054cb"
+            ]
+        ]
+    },
+    {
+        "id": "cfca176ced25e20b",
+        "type": "change",
+        "z": "efa22fa5838a76d1",
+        "g": "3582c2e7b91a443d",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "BW",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 770,
+        "y": 1060,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6f5894d70dd5ad1c",
+        "type": "change",
+        "z": "efa22fa5838a76d1",
+        "g": "3582c2e7b91a443d",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "CR",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 770,
+        "y": 1100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "64376df35e49b3db",
+        "type": "change",
+        "z": "efa22fa5838a76d1",
+        "g": "3582c2e7b91a443d",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "TX",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 770,
+        "y": 1140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3ea7fba3375ce3a5",
+        "type": "ui_dropdown",
+        "z": "efa22fa5838a76d1",
+        "g": "3582c2e7b91a443d",
+        "name": "",
+        "label": "SF",
+        "tooltip": "",
+        "place": "125KHz",
+        "group": "368addc339f6326f",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "multiple": false,
+        "options": [
+            {
+                "label": "7",
+                "value": "1",
+                "type": "str"
+            },
+            {
+                "label": "8",
+                "value": "2",
+                "type": "str"
+            },
+            {
+                "label": "9",
+                "value": "3",
+                "type": "str"
+            },
+            {
+                "label": "10",
+                "value": "4",
+                "type": "str"
+            },
+            {
+                "label": "11",
+                "value": "5",
+                "type": "str"
+            },
+            {
+                "label": "12",
+                "value": "6",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 570,
+        "y": 1020,
+        "wires": [
+            [
+                "8a7ffb1fe394a7e2"
+            ]
+        ]
+    },
+    {
+        "id": "8a7ffb1fe394a7e2",
+        "type": "change",
+        "z": "efa22fa5838a76d1",
+        "g": "3582c2e7b91a443d",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "SF",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 770,
+        "y": 1020,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9e067896257bfc4a",
+        "type": "mqtt out",
+        "z": "efa22fa5838a76d1",
+        "g": "3582c2e7b91a443d",
+        "name": "",
+        "topic": "CGateway/reconfignew",
+        "qos": "0",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "315fb779a9a821b6",
+        "x": 1470,
+        "y": 1080,
+        "wires": []
+    },
+    {
+        "id": "038bb5dc1a8054cb",
+        "type": "function",
+        "z": "efa22fa5838a76d1",
+        "g": "3582c2e7b91a443d",
+        "name": "",
+        "func": "\n// Check if flow variable is available\nif (flow.get('SF') !== undefined || flow.get(\"BW\")!== undefined || flow.get(\"CR\") !== undefined || flow.get(TX) !== undefined) {\n    msg.okay = true;\n    temp =  flow.get('SF').concat(flow.get(\"BW\"));\n    temp = temp.concat(flow.get('CR'))\n    temp = temp.concat(flow.get('TX'))\n    head = \"##\";\n    msg.payload = head.concat(temp);\n    \n} \n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1240,
+        "y": 1080,
+        "wires": [
+            [
+                "9e067896257bfc4a",
+                "fe5f0cddbeb3b927",
+                "cca3764e7ae8fa10"
+            ]
+        ]
+    },
+    {
+        "id": "fe5f0cddbeb3b927",
+        "type": "debug",
+        "z": "efa22fa5838a76d1",
+        "g": "3582c2e7b91a443d",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1370,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "cca3764e7ae8fa10",
+        "type": "function",
+        "z": "efa22fa5838a76d1",
+        "g": "3582c2e7b91a443d",
+        "name": "",
+        "func": "    \n    var SF = flow.get(\"SF\");\n    var BW = flow.get(\"BW\");\n    var CR = flow.get(\"CR\");\n    var TX = flow.get(\"TX\");\n\n    // Mapping values\n    var sfMapping = {1: 'SF 7', 2: 'SF 8', 3: 'SF 9', 4: 'SF 10', 5: 'SF 11', 6: 'SF 12'};\n    var bwMapping = {1: '10.4kHz', 2: '15.6kHz', 3: '20.8kHz', 4: '31.25kHz', 5: '41.7kHz', 6: '62.5kHz', 7: '125kHz', 8: '250kHz', 9: '500kHz'};\n    var crMapping = {5: '4/5', 6: '4/6', 7: '4/7', 8: '4/8'};\n    var txMapping = {0: '2dBm', 1: '3dBm', 2: '4dBm', 3: '5dBm', 4: '6dBm', 5: '7dBm', 6: '8dBm', 7: '9dBm', 8: '10dBm', 9: '11dBm', a: '12dBm', b: '13dBm', c: '14dBm', d: '15dBm', e: '16dBm', f: '17dBm'};\n\n    processedData = {\n        type: 'Reconfig',\n        number: msg.payload.number,\n        rssi: msg.payload.rssi,\n        snr: msg.payload.snr, // Assuming SNR needs to be multiplied by 10\n        ferror: msg.payload.ferror,\n        nodeId: {\n            SF: sfMapping[SF],\n            BW: bwMapping[BW],\n            CR: crMapping[CR],\n            TX: txMapping[TX]\n        }\n    };\n    msg.processedData = processedData; \nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1300,
+        "y": 1160,
+        "wires": [
+            [
+                "2d1cea8691e92132"
+            ]
+        ]
+    },
+    {
+        "id": "2d1cea8691e92132",
+        "type": "link out",
+        "z": "efa22fa5838a76d1",
+        "g": "3582c2e7b91a443d",
+        "name": "",
+        "mode": "link",
+        "links": [
+            "d4368d0f33e3ee82"
+        ],
+        "x": 1545,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "315fb779a9a821b6",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "test.mosquitto.org",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "7e662697b834e974",
+        "type": "ui_group",
+        "name": "Log",
+        "tab": "dc63c20f87b61dc9",
+        "order": 1,
+        "disp": true,
+        "width": "20",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "d7ec2c96679f49aa",
+        "type": "ui_group",
+        "name": "Packet Infomation",
+        "tab": "dc63c20f87b61dc9",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "6f86ca3fe2bcc1f6",
+        "type": "ui_group",
+        "name": "Current Network State",
+        "tab": "dc63c20f87b61dc9",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "368addc339f6326f",
+        "type": "ui_group",
+        "name": "Send Configure",
+        "tab": "dc63c20f87b61dc9",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "dc63c20f87b61dc9",
+        "type": "ui_tab",
+        "name": "Gateway Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
