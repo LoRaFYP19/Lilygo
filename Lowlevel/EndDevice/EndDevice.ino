@@ -10,7 +10,7 @@ SX1276 radio = new Module(RADIO_CS_PIN, RADIO_DIO0_PIN, RADIO_RST_PIN, RADIO_BUS
 
 #define PreAmbleLength 6
 #define wanSync 0x34
-#define nodeID 0
+#define nodeID 1
 
 int Spreadf= 8;
 int OutputPower = 2;
